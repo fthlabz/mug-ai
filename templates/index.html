@@ -6,21 +6,85 @@
     <title>Mug-AI: Dark Studio</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <style>
-        :root { --bg: #0f172a; --card-bg: #1e293b; --text: #f8fafc; --primary: #3b82f6; --primary-hover: #2563eb; --success: #10b981; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg); color: var(--text); display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; overflow: hidden; }
-        .app-container { background: var(--card-bg); padding: 30px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 95vw; max-width: 600px; height: 90vh; display: flex; flex-direction: column; box-sizing: border-box; }
+        :root { 
+            --bg: #0f172a; 
+            --card-bg: #1e293b; 
+            --text: #f8fafc; 
+            --primary: #3b82f6; 
+            --primary-hover: #2563eb; 
+            --success: #10b981; 
+        }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: var(--bg); 
+            color: var(--text); 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            margin: 0; 
+            overflow: hidden; 
+        }
+        .app-container { 
+            background: var(--card-bg); 
+            padding: 30px; 
+            border-radius: 16px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
+            width: 95vw; 
+            max-width: 600px; 
+            height: 90vh; 
+            display: flex; 
+            flex-direction: column;
+            box-sizing: border-box;
+        }
         .header { text-align: center; margin-bottom: 20px; flex-shrink: 0; }
         .header h1 { margin: 0; font-size: 28px; color: var(--primary); }
+        
         label { display: block; font-weight: 600; margin-bottom: 10px; font-size: 18px; }
-        input[type="text"], select { width: 100%; padding: 18px; border-radius: 12px; border: 2px solid #334155; background: #0f172a; color: white; box-sizing: border-box; font-size: 20px; margin-bottom: 20px; flex-shrink: 0; }
+        input[type="text"], select { 
+            width: 100%; 
+            padding: 18px; 
+            border-radius: 12px; 
+            border: 2px solid #334155; 
+            background: #0f172a;
+            color: white;
+            box-sizing: border-box; 
+            font-size: 20px; 
+            margin-bottom: 20px;
+            flex-shrink: 0;
+        }
         input:focus, select:focus { outline: none; border-color: var(--primary); }
+        
         .button-group { display: flex; gap: 10px; flex-shrink: 0; }
-        button { flex: 1; padding: 18px; background: var(--primary); color: white; border: none; border-radius: 12px; font-size: 20px; font-weight: bold; cursor: pointer; }
+        button { 
+            flex: 1;
+            padding: 18px; 
+            background: var(--primary); 
+            color: white; 
+            border: none; 
+            border-radius: 12px; 
+            font-size: 20px; 
+            font-weight: bold; 
+            cursor: pointer; 
+        }
         button:hover { background: var(--primary-hover); }
         button:disabled { background: #475569; color: #94a3b8; cursor: not-allowed; }
+        
         #downloadBtn { background: var(--success); display: none; }
         #downloadBtn:hover { background: #059669; }
-        .image-box { flex-grow: 1; margin-top: 20px; border: 2px dashed #475569; border-radius: 12px; display: flex; justify-content: center; align-items: center; position: relative; background: #0f172a; overflow: hidden; }
+
+        .image-box {
+            flex-grow: 1;
+            margin-top: 20px;
+            border: 2px dashed #475569;
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            background: #0f172a;
+            overflow: hidden;
+        }
         #status { font-size: 18px; color: #fbbf24; font-weight: bold; display: none; position: absolute; text-align: center; z-index: 10; padding: 10px;}
         #result-img { max-width: 100%; max-height: 100%; display: none; object-fit: contain; z-index: 5; }
     </style>
@@ -53,6 +117,7 @@
 </div>
 
 <script>
+    // Hayalet Kilit
     const sifreliKasa = "U2FsdGVkX1/7ytPepRabsGIChr25zzuga4wkk5q74mbbLrGDZD4VhMKw8mng7QncKmcyJGwPxZ0gAPHu2yEU/w==";
     const gizliPin = "1453"; 
     
@@ -75,6 +140,7 @@
         try {
             const bytes = CryptoJS.AES.decrypt(sifreliKasa, gizliPin);
             cachedApiKey = bytes.toString(CryptoJS.enc.Utf8);
+
             if (!cachedApiKey) { alert("Sistem kilit hatası!"); return; }
 
             btn.disabled = true;
@@ -92,13 +158,13 @@
                 }
             } catch(e) { console.warn("Çeviri başarısız."); }
 
-            statusEl.innerHTML = "O pofuduk 3D Görsel İşleniyor (15-30 sn)... ⏳";
+            statusEl.innerHTML = "O pofuduk 3D Görsel İşleniyor (Bu işlem 15-30 sn sürebilir)... ⏳";
             
-            // İŞTE O SİHİRLİ PROMPT: Konu %100 gerçekçi, çerçeve pofuduk diorama
-            const finalPrompt = `A hyper-realistic, ultra-detailed, living ${englishSubject} with real physical textures, peering out from inside a deep hole. The subject's paws or base are resting gently on the bottom lip of the hole. The surrounding frame and environment are made of highly detailed, layered paper-cut shadow box, soft foam/clay texture, 3D diorama. The frame consists of thick, chunky, soft white and light blue foam-like shapes resembling abstract snow crystals and soft clouds forming a cave aperture. The central subject is entirely real and photorealistic, contrasting perfectly with the soft clay/foam diorama frame. Light blue and white color palette, 8k, extreme 3D depth pop-out effect, highly adorable and cinematic.`;
+            // İŞTE O SİHİRLİ DÜZELTİLMİŞ PROMPT:
+            // Ana obje GERÇEK, Etrafı POFUDUK bulut tüneli
+            const finalPrompt = `Highly detailed volumetric paper-cut style diorama shadow box. Centered, a photorealistic cute fluffy ${englishSubject} peering out directly with striking large blue eyes. The subject is not paper and possesses real texture and depth. The surrounding external aperture is composed of intricate, volumetric layers of chunky soft white pofuduk cloud-like formations and snow crystals, like a cloud tunnel. Integrated soft snowflake accents. Diffused light blue and white lighting creating deep volumetric shadows emphasizing texture. Whimsical and adorable. High resolution. Focus on the realistic subject and volumetric pofuduk clouds.`;
             
-            // Negatif prompt ile kağıt objeleri kesin olarak engelliyoruz
-            const negativePrompt = "paper animal, paper subject, origami, 2d, illustration, drawing, painting, flat, low quality, abstract subject, stiff frame, wood, metal, plastic, ugly, deformed";
+            const negativePrompt = "paper subject, paper animal, flat, 2d, drawing, painting, illustration, skinny, deformed, ugly, poorly drawn, blurry, low resolution, cartoon, anime, text, watermark";
 
             const startRes = await fetch("/api/generate", {
                 method: "POST",
