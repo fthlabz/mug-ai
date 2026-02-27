@@ -15,6 +15,7 @@
             --factory: #8b5cf6;
             --factory-hover: #7c3aed;
             --success: #10b981; 
+            --warning: #f59e0b;
         }
         body { 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
@@ -23,18 +24,18 @@
             display: flex; 
             justify-content: center; 
             align-items: center; 
-            height: 100vh; 
+            min-height: 100vh; 
             margin: 0; 
-            overflow: hidden; 
+            padding: 20px;
+            box-sizing: border-box;
         }
         .app-container { 
             background: var(--card-bg); 
             padding: 30px; 
             border-radius: 16px; 
             box-shadow: 0 10px 40px rgba(0,0,0,0.6); 
-            width: 95vw; 
+            width: 100%; 
             max-width: 650px; 
-            height: 95vh; 
             display: flex; 
             flex-direction: column;
             box-sizing: border-box;
@@ -77,6 +78,12 @@
         #factoryBtn:hover { background: var(--factory-hover); }
         button:disabled { background: #475569 !important; color: #94a3b8; cursor: not-allowed; }
         
+        .download-group { display: flex; gap: 10px; margin-top: 15px; }
+        #downloadPngBtn { background: var(--success); display: none; }
+        #downloadJpgBtn { background: var(--warning); display: none; }
+        #downloadPngBtn:hover { background: #059669; }
+        #downloadJpgBtn:hover { background: #d97706; }
+
         .progress-container { margin-top: 15px; display: none; background: #334155; border-radius: 8px; height: 8px; overflow: hidden; }
         .progress-bar { height: 100%; background: var(--factory); width: 0%; transition: width 0.3s; }
 
@@ -91,6 +98,7 @@
             position: relative;
             background: #0f172a;
             overflow: hidden;
+            min-height: 250px;
         }
         #status { font-size: 15px; color: #fbbf24; font-weight: bold; display: none; position: absolute; text-align: center; z-index: 10; padding: 15px;}
         #result-img { max-width: 100%; max-height: 100%; display: none; object-fit: contain; z-index: 5; }
@@ -103,6 +111,12 @@
         <h1>Mug-AI Autonomous Engine</h1>
         <p>Pro-Level SaaS Print Generator</p>
     </div>
+
+    <label for="printSize">Baskı Boyutu (Çözünürlük)</label>
+    <select id="printSize">
+        <option value="wrap">Panoramik (Kupayı Saran - 1344x768)</option>
+        <option value="square">Kare (Sadece Ön Yüz - 1024x1024)</option>
+    </select>
 
     <label for="promptInput">Ana Karakter (Sadece konuyu yazın)</label>
     <input type="text" id="promptInput" placeholder="Örn: Beyaz tüylü tatlı bir kedi">
@@ -120,7 +134,7 @@
 
     <div class="button-group">
         <button id="generateBtn" onclick="uretimeBasla(1)">Tekli Test</button>
-        <button id="factoryBtn" onclick="uretimeBasla(20)">🚀 Otonom Fabrika (20x)</button>
+        <button id="factoryBtn" onclick="uretimeBasla(10)">🚀 Otonom Fabrika (10x)</button>
     </div>
 
     <div class="progress-container" id="progressContainer">
@@ -131,39 +145,47 @@
         <div id="status">Sistem hazır...</div>
         <img id="result-img" src="" alt="Sonuç">
     </div>
+
+    <div class="download-group">
+        <button id="downloadPngBtn" onclick="gorseliIndirManuel('png')">⬇️ PNG İndir</button>
+        <button id="downloadJpgBtn" onclick="gorseliIndirManuel('jpg')">⬇️ Yüksek Kalite JPEG İndir</button>
+    </div>
 </div>
 
 <script>
+    // Hayalet Kilit Mimarisi
     const sifreliKasa = "U2FsdGVkX1/7ytPepRabsGIChr25zzuga4wkk5q74mbbLrGDZD4VhMKw8mng7QncKmcyJGwPxZ0gAPHu2yEU/w==";
     const gizliPin = "1453"; 
     
     let isFactoryRunning = false;
     let currentPredictionId = null;
     let cachedApiKey = null;
+    let lastGeneratedImgUrl = ""; // Manuel indirme için hafızada tutar
 
     const emotionVariations = [
-        "happy expression",
-        "sleepy expression",
-        "playful mood",
-        "curious look",
-        "soft smile",
-        "majestic and calm",
-        "innocent wide eyes",
-        "gentle gaze",
-        "slightly tilted head",
-        "warm inviting eyes"
+        "happy expression", "sleepy expression", "playful mood", 
+        "curious look", "soft smile", "majestic and calm", 
+        "innocent wide eyes", "gentle gaze", "slightly tilted head", "warm inviting eyes"
     ];
 
     async function uretimeBasla(count) {
         const userSubject = document.getElementById('promptInput').value;
         const guidanceScale = parseFloat(document.getElementById('guidanceScale').value);
         const numSteps = parseInt(document.getElementById('numSteps').value);
+        
+        // Boyut Seçimini API'ye Göndermek İçin Yakalama
+        const printSize = document.getElementById('printSize').value;
+        const width = printSize === "wrap" ? 1344 : 1024;
+        const height = printSize === "wrap" ? 768 : 1024;
+
         const btnSingle = document.getElementById('generateBtn');
         const btnFactory = document.getElementById('factoryBtn');
         const statusEl = document.getElementById('status');
         const resultImg = document.getElementById('result-img');
         const progressContainer = document.getElementById('progressContainer');
         const progressBar = document.getElementById('progressBar');
+        const dlPngBtn = document.getElementById('downloadPngBtn');
+        const dlJpgBtn = document.getElementById('downloadJpgBtn');
 
         if (!userSubject) { alert("Lütfen ana karakteri yazın!"); return; }
 
@@ -176,6 +198,8 @@
             btnSingle.disabled = true;
             btnFactory.disabled = true;
             resultImg.style.display = "none";
+            dlPngBtn.style.display = "none";
+            dlJpgBtn.style.display = "none";
             progressContainer.style.display = count > 1 ? "block" : "none";
 
             statusEl.innerHTML = "Çevriliyor... 🇹🇷 ➔ 🇬🇧";
@@ -192,17 +216,17 @@
             for (let i = 1; i <= count; i++) {
                 if (!isFactoryRunning) break;
 
-                // SEED ÜRETİMİ (Sadece burası eklendi)
                 const seed = Math.floor(Math.random() * 1000000);
 
                 statusEl.innerHTML = count > 1 
-                    ? `OTONOM ÜRETİM<br>Varyasyon: ${i} / ${count} (Seed: ${seed}) ⏳<br><small>Her üretim PNG olarak indiriliyor.</small>` 
+                    ? `OTONOM ÜRETİM<br>Varyasyon: ${i} / ${count} (Seed: ${seed}) ⏳<br><small>Ön izleme sonrası otomatik indiriliyor.</small>` 
                     : "Master Görsel İşleniyor... ⏳";
                 
                 progressBar.style.width = `${((i - 1) / count) * 100}%`;
 
                 const randomVariation = emotionVariations[Math.floor(Math.random() * emotionVariations.length)];
 
+                // MASTER PROMPT MİMARİSİ
                 const finalPrompt = `MASTERPIECE PHOTO. REAL SUBJECT FIRST.
 YOU ARE GENERATING A REAL PHOTOGRAPH — NOT ARTWORK.
 
@@ -226,7 +250,6 @@ ABSOLUTELY NO STRUCTURES OR SCENES.`;
                 
                 const negativePrompt = `frame, border, window, box, cube, shadowbox, diorama, paper art, papercraft, paper cut, origami, cardboard, wood, stage, installation, sculpture, illustration, drawing, painting, cartoon, cgi, 3d render, decorative scene`;
 
-                // API BODY'E SEED EKLENDİ (Sadece burası değiştirildi)
                 const startRes = await fetch("/api/generate", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -236,8 +259,8 @@ ABSOLUTELY NO STRUCTURES OR SCENES.`;
                         negative_prompt: negativePrompt,
                         guidance_scale: guidanceScale, 
                         num_inference_steps: numSteps,
-                        width: 1344, 
-                        height: 768,
+                        width: width,  // Seçime göre dinamik
+                        height: height, // Seçime göre dinamik
                         seed: seed
                     })
                 });
@@ -259,10 +282,23 @@ ABSOLUTELY NO STRUCTURES OR SCENES.`;
 
                     if (pollData.status === "succeeded") {
                         const imgUrl = pollData.output[0];
+                        lastGeneratedImgUrl = imgUrl; // Manuel indirme için kaydet
+                        
+                        // Ekranda Ön İzleme Gösterme
                         resultImg.src = imgUrl;
                         resultImg.style.display = "block";
                         
-                        await gorseliIndir(imgUrl, `Mug-AI-${englishSubject.replace(/\s+/g, '-')}-var${i}-s${seed}`);
+                        if(count === 1) {
+                            // Tekli testte butonları aç, kullanıcı seçip indirsin
+                            dlPngBtn.style.display = "block";
+                            dlJpgBtn.style.display = "block";
+                        } else {
+                            // Factory Mode: Kullanıcının resmi görebilmesi için 1.5 saniye bekle, sonra indir
+                            await new Promise(res => setTimeout(res, 1500));
+                            const dosyaAdi = `Mug-AI-${englishSubject.replace(/\s+/g, '-')}-var${i}-s${seed}`;
+                            await indirFormat(imgUrl, dosyaAdi, 'png');
+                            await indirFormat(imgUrl, dosyaAdi, 'jpg');
+                        }
                         
                         currentPredictionId = null; 
                         break;
@@ -273,7 +309,7 @@ ABSOLUTELY NO STRUCTURES OR SCENES.`;
             }
             
             progressBar.style.width = "100%";
-            statusEl.innerHTML = "✅ Tüm Otonom Üretimler Tamamlandı!";
+            statusEl.innerHTML = count > 1 ? "✅ Fabrika Üretimi Tamamlandı!" : "✅ Üretim Tamam!";
 
         } catch (error) {
             console.error("Hata:", error);
@@ -287,23 +323,60 @@ ABSOLUTELY NO STRUCTURES OR SCENES.`;
         }
     }
 
-    async function gorseliIndir(imgUrl, filename) {
+    // Arayüzdeki Butonlardan Gelen İndirme Talebi
+    async function gorseliIndirManuel(format) {
+        if(!lastGeneratedImgUrl) return;
+        const filename = `Mug-AI-Single-${Date.now()}`;
+        await indirFormat(lastGeneratedImgUrl, filename, format);
+    }
+
+    // Yüksek Çözünürlüklü Tuval Motoru ile İndirme (PNG ve Maksimum Kalite JPEG)
+    async function indirFormat(imgUrl, filename, format) {
         try {
             const response = await fetch(imgUrl);
             const blob = await response.blob();
             const blobUrl = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = blobUrl;
-            a.download = `${filename}.png`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            window.URL.revokeObjectURL(blobUrl);
-        } catch (e) { 
-            window.open(imgUrl, '_blank'); 
+            
+            if (format === 'png') {
+                tetikleIndirme(blobUrl, `${filename}.png`);
+            } else if (format === 'jpg' || format === 'jpeg') {
+                const img = new Image();
+                img.crossOrigin = "Anonymous";
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    const ctx = canvas.getContext('2d');
+                    
+                    // Şeffaflık (alpha) varsa arka planı beyaz yap
+                    ctx.fillStyle = "#FFFFFF";
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(img, 0, 0);
+                    
+                    // Maksimum Kalitede (1.0) JPEG oluştur
+                    canvas.toBlob((jpegBlob) => {
+                        const jpegUrl = window.URL.createObjectURL(jpegBlob);
+                        tetikleIndirme(jpegUrl, `${filename}.jpg`);
+                    }, 'image/jpeg', 1.0); 
+                };
+                img.src = blobUrl;
+            }
+        } catch (e) {
+            window.open(imgUrl, '_blank');
         }
     }
 
+    // Tarayıcı İndirme Tetikleyicisi
+    function tetikleIndirme(url, dosyaAdi) {
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = dosyaAdi;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    }
+
+    // Acil Fren Sistemi
     window.addEventListener('beforeunload', (event) => {
         isFactoryRunning = false;
         if (currentPredictionId && cachedApiKey) {
