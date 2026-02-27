@@ -1,15 +1,12 @@
 from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 import requests
-import time
 
 app = Flask(__name__)
-# Hangi kapıdan gelirse gelsin kabul et (CORS İzni)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
 @app.route('/')
 def index():
-    # Arayüzü render et
     return render_template('index.html')
 
 @app.route('/api/generate', methods=['POST'])
@@ -17,48 +14,60 @@ def generate():
     data = request.json
     api_key = data.get('token')
     prompt = data.get('prompt')
-    width = data.get('width', 1024)
-    height = data.get('height', 1024)
+    negative_prompt = data.get('negative_prompt', "")
+    width = data.get('width', 1344)
+    height = data.get('height', 768)
+    # Modelin kalite ve sadakat ayarları
+    guidance_scale = data.get('guidance_scale', 8.0)
+    num_inference_steps = data.get('num_inference_steps', 50)
 
-    if not api_key or not prompt:
-        return jsonify({"error": "Eksik bilgi gönderildi."}), 400
-
-    headers = {
-        "Authorization": f"Token {api_key}",
-        "Content-Type": "application/json"
-    }
-
-    # Replicate SDXL Modeli
+    headers = {"Authorization": f"Token {api_key}", "Content-Type": "application/json"}
+    
+    # SDXL Modeli
     payload = {
         "version": "39ed52f2a78e934b3ba6e2a89f5b1c712de7dfea535525255b1aa35c5565e08b",
         "input": {
             "prompt": prompt,
+            "negative_prompt": negative_prompt,
             "width": width,
             "height": height,
+            "guidance_scale": guidance_scale,
+            "num_inference_steps": num_inference_steps,
             "refine": "expert_ensemble_refiner",
             "apply_watermark": False
         }
     }
-
+    
     try:
-        # Replicate'e işlemi başlatma emri
-        start_res = requests.post("https://api.replicate.com/v1/predictions", headers=headers, json=payload)
-        if start_res.status_code != 201:
-            return jsonify({"error": "Replicate API hatası."}), 500
+        res = requests.post("https://api.replicate.com/v1/predictions", headers=headers, json=payload)
+        if res.status_code != 201:
+            return jsonify({"error": "Replicate API hatası"}), 500
+        return jsonify(res.json())
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
-        prediction = start_res.json()
-        get_url = prediction['urls']['get']
+@app.route('/api/status/<prediction_id>', methods=['POST'])
+def status(prediction_id):
+    api_key = request.json.get('token')
+    headers = {"Authorization": f"Token {api_key}"}
+    try:
+        res = requests.get(f"https://api.replicate.com/v1/predictions/{prediction_id}", headers=headers)
+        return jsonify(res.json())
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
-        # Sonuç Bekleme Döngüsü (Backend tarafında polling)
-        while True:
-            time.sleep(2) # API'yi yormamak için 2 saniye bekle
-            poll_res = requests.get(get_url, headers=headers).json()
-            
-            if poll_res['status'] == 'succeeded':
-                return jsonify({"output": poll_res['output'][0]})
-            elif poll_res['status'] == 'failed':
-                return jsonify({"error": "Görsel üretimi başarısız oldu."}), 500
-
+@app.route('/api/cancel', methods=['POST'])
+def cancel():
+    data = request.json
+    api_key = data.get('token')
+    prediction_id = data.get('id')
+    if not api_key or not prediction_id:
+        return jsonify({"status": "ignored"}), 200
+        
+    headers = {"Authorization": f"Token {api_key}"}
+    try:
+        requests.post(f"https://api.replicate.com/v1/predictions/{prediction_id}/cancel", headers=headers)
+        return jsonify({"status": "cancelled"})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
