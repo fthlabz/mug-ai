@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mug-AI: 3D Kupa Baskı Görsel Üretici</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --success: #10b981;
+            --success-hover: #059669;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #0f172a;
+        }
+        body { 
+            font-family: 'Inter', system-ui, -apple-system, sans-serif; 
+            background-color: var(--bg); 
+            color: var(--text);
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .app-container { 
+            background: var(--card-bg); 
+            padding: 40px; 
+            border-radius: 20px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05); 
+            width: 100%;
+            max-width: 500px;
+        }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header h1 { margin: 0; font-size: 24px; color: var(--primary); }
+        .header p { margin: 5px 0 0; font-size: 14px; color: #64748b; }
+        
+        .input-group { margin-bottom: 20px; }
+        label { display: block; font-weight: 600; margin-bottom: 8px; font-size: 14px; }
+        input[type="password"], input[type="text"] { 
+            width: 100%; 
+            padding: 14px; 
+            border-radius: 10px; 
+            border: 2px solid #e2e8f0; 
+            box-sizing: border-box; 
+            font-size: 15px;
+            transition: border-color 0.3s;
+        }
+        input:focus { outline: none; border-color: var(--primary); }
+        
+        button { 
+            width: 100%; 
+            padding: 16px; 
+            background: var(--primary); 
+            color: white; 
+            border: none; 
+            border-radius: 10px; 
+            font-size: 16px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            transition: background 0.3s, transform 0.1s;
+        }
+        button:hover { background: var(--primary-hover); }
+        button:active { transform: scale(0.98); }
+        button:disabled { background: #94a3b8; cursor: not-allowed; }
+        
+        #downloadBtn {
+            background: var(--success);
+            margin-top: 15px;
+            display: none; /* İlk başta gizli */
+        }
+        #downloadBtn:hover { background: var(--success-hover); }
+
+        .status-message {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 14px;
+            color: #d97706;
+            font-weight: 500;
+            display: none;
+        }
+        
+        .result-container { margin-top: 30px; text-align: center; }
+        #result-img { 
+            width: 100%; 
+            border-radius: 12px; 
+            display: none; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border: 4px solid white;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <div class="header">
+        <h1>☕ Mug-AI Studio</h1>
+        <p>Premium 3D Kupa Baskı Görselleri</p>
+    </div>
+
+    <div class="input-group">
+        <label for="gizliPin">Sistem Erişim PIN'i</label>
+        <input type="password" id="gizliPin" placeholder="PIN kodunu girin (Örn: 1453)">
+    </div>
+
+    <div class="input-group">
+        <label for="promptInput">Müşteri Ne İstiyor?</label>
+        <input type="text" id="promptInput" placeholder="Örn: Kahve içen sevimli bir baykuş...">
+    </div>
+
+    <button id="generateBtn" onclick="uretimeBasla()">Görseli Oluştur</button>
+    <div id="status" class="status-message">Üretiliyor, lütfen bekleyin (Yaklaşık 15-20 sn)...</div>
+
+    <div class="result-container">
+        <img id="result-img" src="" alt="Üretilen Kupa Baskı Görseli">
+        <button id="downloadBtn" onclick="gorseliIndir()">⬇️ PNG Olarak İndir</button>
+    </div>
+</div>
+
+<script>
+    // Hayalet Kilit Mimarisi - Şifreli Token
+    const sifreliKasa = "U2FsdGVkX1/7ytPepRabsGIChr25zzuga4wkk5q74mbbLrGDZD4VhMKw8mng7QncKmcyJGwPxZ0gAPHu2yEU/w==";
+    
+    // Standart Kupa Baskı Stili
+    const baseStylePrompt = "highly detailed, layered paper-cut shadow box, soft foam/clay texture, 3D diorama";
+
+    async function uretimeBasla() {
+        const pin = document.getElementById('gizliPin').value;
+        const userSubject = document.getElementById('promptInput').value;
+        const btn = document.getElementById('generateBtn');
+        const statusEl = document.getElementById('status');
+        const resultImg = document.getElementById('result-img');
+        const downloadBtn = document.getElementById('downloadBtn');
+
+        if (!pin || !userSubject) {
+            alert("Lütfen hem PIN kodunu hem de ne üretmek istediğinizi yazın.");
+            return;
+        }
+
+        try {
+            // 1. Hayalet Kilit Şifre Çözümü
+            const bytes = CryptoJS.AES.decrypt(sifreliKasa, pin);
+            const apiKey = bytes.toString(CryptoJS.enc.Utf8);
+
+            if (!apiKey) {
+                alert("Hatalı PIN! Sisteme erişim reddedildi.");
+                return;
+            }
+
+            // Arayüzü bekleme moduna al
+            btn.disabled = true;
+            statusEl.style.display = "block";
+            resultImg.style.display = "none";
+            downloadBtn.style.display = "none";
+            
+            // 2. Prompt Birleştirme
+            const finalPrompt = `${userSubject}, ${baseStylePrompt}, centered composition, pure white background for mug printing`;
+
+            // 3. Replicate API İsteği Başlatma
+            const proxyUrl = "https://corsproxy.io/?";
+            const replicateUrl = "https://api.replicate.com/v1/predictions";
+            
+            const startResponse = await fetch(proxyUrl + encodeURIComponent(replicateUrl), {
+                method: "POST",
+                headers: {
+                    "Authorization": `Token ${apiKey}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    version: "39ed52f2a78e934b3ba6e2a89f5b1c712de7dfea535525255b1aa35c5565e08b", // SDXL
+                    input: { 
+                        prompt: finalPrompt,
+                        width: 1024,
+                        height: 1024,
+                        refine: "expert_ensemble_refiner",
+                        apply_watermark: false
+                    }
+                })
+            });
+
+            if (!startResponse.ok) throw new Error("API'ye ulaşılamadı. Token süresi veya proxy durumu kontrol edilmeli.");
+            
+            let prediction = await startResponse.json();
+
+            // 4. Sonuç Bekleme Döngüsü (Polling)
+            const getUrl = proxyUrl + encodeURIComponent(`https://api.replicate.com/v1/predictions/${prediction.id}`);
+            
+            while (prediction.status !== "succeeded" && prediction.status !== "failed") {
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                const pollResponse = await fetch(getUrl, {
+                    headers: { "Authorization": `Token ${apiKey}` }
+                });
+                prediction = await pollResponse.json();
+            }
+
+            if (prediction.status === "succeeded") {
+                resultImg.src = prediction.output[0];
+                resultImg.style.display = "block";
+                downloadBtn.style.display = "block"; // İndir butonunu göster
+            } else {
+                throw new Error("Görsel üretilemedi.");
+            }
+
+        } catch (error) {
+            console.error("Hata:", error);
+            alert("Bir sorun oluştu: " + error.message);
+        } finally {
+            // Arayüzü eski haline getir
+            btn.disabled = false;
+            statusEl.style.display = "none";
+        }
+    }
+
+    // Görseli Doğrudan PNG Olarak İndirme Fonksiyonu
+    async function gorseliIndir() {
+        const imgUrl = document.getElementById('result-img').src;
+        if (!imgUrl) return;
+
+        try {
+            // Yeni sekmede açmak yerine dosyayı zorla indirtmek için Blob kullanıyoruz
+            const response = await fetch(imgUrl);
+            const blob = await response.blob();
+            const blobUrl = window.URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = blobUrl;
+            a.download = `mug-ai-baski-${Date.now()}.png`; // Benzersiz dosya adı
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(blobUrl);
+        } catch (error) {
+            // Blob yöntemi takılırsa B planı olarak yeni sekmede aç
+            window.open(imgUrl, '_blank');
+        }
+    }
+</script>
+
+</body>
+</html>
