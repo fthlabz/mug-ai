@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mug-AI: Master Studio</title>
+    <title>Mug-AI: SaaS Autonomous Engine</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <style>
         :root { 
@@ -12,6 +12,8 @@
             --text: #f8fafc; 
             --primary: #3b82f6; 
             --primary-hover: #2563eb; 
+            --factory: #8b5cf6;
+            --factory-hover: #7c3aed;
             --success: #10b981; 
         }
         body { 
@@ -29,53 +31,58 @@
             background: var(--card-bg); 
             padding: 30px; 
             border-radius: 16px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
+            box-shadow: 0 10px 40px rgba(0,0,0,0.6); 
             width: 95vw; 
-            max-width: 600px; 
-            height: 90vh; 
+            max-width: 650px; 
+            height: 95vh; 
             display: flex; 
             flex-direction: column;
             box-sizing: border-box;
         }
         .header { text-align: center; margin-bottom: 20px; flex-shrink: 0; }
-        .header h1 { margin: 0; font-size: 28px; color: var(--primary); }
+        .header h1 { margin: 0; font-size: 26px; color: var(--primary); }
+        .header p { margin: 5px 0 0; color: #94a3b8; font-size: 13px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
         
-        label { display: block; font-weight: 600; margin-bottom: 10px; font-size: 18px; }
-        input[type="text"], select { 
+        label { display: block; font-weight: 600; margin-bottom: 8px; font-size: 14px; color: #cbd5e1; }
+        input[type="text"], input[type="number"], select { 
             width: 100%; 
-            padding: 18px; 
-            border-radius: 12px; 
+            padding: 14px; 
+            border-radius: 10px; 
             border: 2px solid #334155; 
             background: #0f172a;
             color: white;
             box-sizing: border-box; 
-            font-size: 20px; 
-            margin-bottom: 20px;
-            flex-shrink: 0;
+            font-size: 16px; 
+            margin-bottom: 15px;
         }
         input:focus, select:focus { outline: none; border-color: var(--primary); }
         
-        .button-group { display: flex; gap: 10px; flex-shrink: 0; }
+        .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
+        
+        .button-group { display: flex; gap: 10px; flex-shrink: 0; margin-top: 5px; }
         button { 
             flex: 1;
-            padding: 18px; 
-            background: var(--primary); 
+            padding: 16px; 
             color: white; 
             border: none; 
-            border-radius: 12px; 
-            font-size: 20px; 
+            border-radius: 10px; 
+            font-size: 16px; 
             font-weight: bold; 
             cursor: pointer; 
+            transition: all 0.2s;
         }
-        button:hover { background: var(--primary-hover); }
-        button:disabled { background: #475569; color: #94a3b8; cursor: not-allowed; }
+        #generateBtn { background: var(--primary); }
+        #generateBtn:hover { background: var(--primary-hover); }
+        #factoryBtn { background: var(--factory); }
+        #factoryBtn:hover { background: var(--factory-hover); }
+        button:disabled { background: #475569 !important; color: #94a3b8; cursor: not-allowed; }
         
-        #downloadBtn { background: var(--success); display: none; }
-        #downloadBtn:hover { background: #059669; }
+        .progress-container { margin-top: 15px; display: none; background: #334155; border-radius: 8px; height: 8px; overflow: hidden; }
+        .progress-bar { height: 100%; background: var(--factory); width: 0%; transition: width 0.3s; }
 
         .image-box {
             flex-grow: 1;
-            margin-top: 20px;
+            margin-top: 15px;
             border: 2px dashed #475569;
             border-radius: 12px;
             display: flex;
@@ -85,7 +92,7 @@
             background: #0f172a;
             overflow: hidden;
         }
-        #status { font-size: 18px; color: #fbbf24; font-weight: bold; display: none; position: absolute; text-align: center; z-index: 10; padding: 10px;}
+        #status { font-size: 15px; color: #fbbf24; font-weight: bold; display: none; position: absolute; text-align: center; z-index: 10; padding: 15px;}
         #result-img { max-width: 100%; max-height: 100%; display: none; object-fit: contain; z-index: 5; }
     </style>
 </head>
@@ -93,25 +100,35 @@
 
 <div class="app-container">
     <div class="header">
-        <h1>Mug-AI Master Studio</h1>
+        <h1>Mug-AI Autonomous Engine</h1>
+        <p>Pro-Level SaaS Print Generator</p>
     </div>
 
-    <label for="printSize">Baskı Boyutu</label>
-    <select id="printSize">
-        <option value="wrap">Panoramik (Kupayı Saran)</option>
-        <option value="square">Kare (Sadece Ön Yüz)</option>
-    </select>
+    <label for="promptInput">Ana Karakter (Sadece konuyu yazın)</label>
+    <input type="text" id="promptInput" placeholder="Örn: Beyaz tüylü tatlı bir kedi">
 
-    <label for="promptInput">Ne Üretelim?</label>
-    <input type="text" id="promptInput" placeholder="Örn: Beyaz tatlı bir kedi...">
+    <div class="settings-grid">
+        <div>
+            <label for="guidanceScale">Guidance Scale (AI Sadakati)</label>
+            <input type="number" id="guidanceScale" value="6.5" step="0.1" min="1" max="20">
+        </div>
+        <div>
+            <label for="numSteps">Inference Steps (Kalite)</label>
+            <input type="number" id="numSteps" value="50" step="1" min="10" max="100">
+        </div>
+    </div>
 
     <div class="button-group">
-        <button id="generateBtn" onclick="uretimeBasla()">Üret</button>
-        <button id="downloadBtn" onclick="gorseliIndir()">İndir</button>
+        <button id="generateBtn" onclick="uretimeBasla(1)">Tekli Test</button>
+        <button id="factoryBtn" onclick="uretimeBasla(20)">🚀 Otonom Fabrika (20x)</button>
+    </div>
+
+    <div class="progress-container" id="progressContainer">
+        <div class="progress-bar" id="progressBar"></div>
     </div>
 
     <div class="image-box">
-        <div id="status">Hazırlanıyor...</div>
+        <div id="status">Sistem hazır...</div>
         <img id="result-img" src="" alt="Sonuç">
     </div>
 </div>
@@ -121,34 +138,50 @@
     const sifreliKasa = "U2FsdGVkX1/7ytPepRabsGIChr25zzuga4wkk5q74mbbLrGDZD4VhMKw8mng7QncKmcyJGwPxZ0gAPHu2yEU/w==";
     const gizliPin = "1453"; 
     
+    let isFactoryRunning = false;
     let currentPredictionId = null;
     let cachedApiKey = null;
 
-    async function uretimeBasla() {
+    // Autonomous Mikro Varyasyon Havuzu
+    const emotionVariations = [
+        "happy expression",
+        "sleepy expression",
+        "playful mood",
+        "curious look",
+        "soft smile",
+        "majestic and calm",
+        "innocent wide eyes",
+        "gentle gaze",
+        "slightly tilted head",
+        "warm inviting eyes"
+    ];
+
+    async function uretimeBasla(count) {
         const userSubject = document.getElementById('promptInput').value;
-        const printSize = document.getElementById('printSize').value;
-        const btn = document.getElementById('generateBtn');
+        const guidanceScale = parseFloat(document.getElementById('guidanceScale').value);
+        const numSteps = parseInt(document.getElementById('numSteps').value);
+        const btnSingle = document.getElementById('generateBtn');
+        const btnFactory = document.getElementById('factoryBtn');
         const statusEl = document.getElementById('status');
         const resultImg = document.getElementById('result-img');
-        const downloadBtn = document.getElementById('downloadBtn');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressBar = document.getElementById('progressBar');
 
-        if (!userSubject) { alert("Lütfen üretilecek konuyu yazın!"); return; }
-
-        let width = printSize === "wrap" ? 1344 : 1024;
-        let height = printSize === "wrap" ? 768 : 1024;
+        if (!userSubject) { alert("Lütfen ana karakteri yazın!"); return; }
 
         try {
             const bytes = CryptoJS.AES.decrypt(sifreliKasa, gizliPin);
             cachedApiKey = bytes.toString(CryptoJS.enc.Utf8);
-
             if (!cachedApiKey) { alert("Sistem kilit hatası!"); return; }
 
-            btn.disabled = true;
+            isFactoryRunning = true;
+            btnSingle.disabled = true;
+            btnFactory.disabled = true;
             resultImg.style.display = "none";
-            downloadBtn.style.display = "none";
-            statusEl.innerHTML = "Türkçe girdi çevriliyor... 🇹🇷 ➔ 🇬🇧";
-            statusEl.style.display = "block";
+            progressContainer.style.display = count > 1 ? "block" : "none";
 
+            statusEl.innerHTML = "Çevriliyor... 🇹🇷 ➔ 🇬🇧";
+            statusEl.style.display = "block";
             let englishSubject = userSubject;
             try {
                 const trRes = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(userSubject)}&langpair=tr|en`);
@@ -158,71 +191,122 @@
                 }
             } catch(e) { console.warn("Çeviri başarısız."); }
 
-            statusEl.innerHTML = "Master Görsel İşleniyor (15-30 sn)... ⏳";
-            
-            // PRO LEVEL MASTER PROMPT MİMARİSİ
-            const finalPrompt = `MASTERPIECE PHOTOGRAPH. ULTRA REALISTIC. NOT ARTWORK.
-STYLE RULES (MANDATORY): real photography, highly detailed, layered paper-cut shadow box, soft foam/clay texture, 3D diorama, organic soft materials, natural fluffy texture, living subject focus, minimal environment, no constructed scene, no artistic interpretation.
-SUBJECT: A hyper realistic fluffy ${englishSubject} peeking through a soft circular opening made ONLY of clouds and snow.
-COMPOSITION: subject centered, face dominant, close-up macro shot, subject closer than environment.
-ENVIRONMENT: soft pastel blue background, cloud opening looks natural and alive, no solid structures.
-CAMERA: 85mm lens, studio lighting, shallow depth of field, photographic realism, 8k ultra detailed fur texture, extreme cuteness realism.`;
-            
-            // NEGATIVE MASTER PROMPT
-            const negativePrompt = `frame, square frame, border, box, cube, cardboard, wood, wooden structure, scene design, illustration, cartoon, painting, drawing, cgi scene, 3d render room, stage, fake environment`;
+            // Üretim Döngüsü (Factory Mode)
+            for (let i = 1; i <= count; i++) {
+                if (!isFactoryRunning) break;
 
-            const startRes = await fetch("/api/generate", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ 
-                    token: cachedApiKey, 
-                    prompt: finalPrompt,
-                    negative_prompt: negativePrompt,
-                    guidance_scale: 8.5, 
-                    num_inference_steps: 50,
-                    width: width, 
-                    height: height 
-                })
-            });
-
-            const startData = await startRes.json();
-            if (startData.error) throw new Error(startData.error);
-            
-            currentPredictionId = startData.id;
-
-            while (currentPredictionId) {
-                await new Promise(resolve => setTimeout(resolve, 2000));
+                statusEl.innerHTML = count > 1 
+                    ? `OTONOM ÜRETİM<br>Varyasyon: ${i} / ${count} ⏳<br><small>Her üretim PNG olarak indiriliyor.</small>` 
+                    : "Master Görsel İşleniyor... ⏳";
                 
-                const pollRes = await fetch(`/api/status/${currentPredictionId}`, {
+                progressBar.style.width = `${((i - 1) / count) * 100}%`;
+
+                // Otonom Varyasyon Seçimi
+                const randomVariation = emotionVariations[Math.floor(Math.random() * emotionVariations.length)];
+
+                // SENİN KUSURSUZ MASTER PROMPTUN
+                const finalPrompt = `MASTERPIECE PHOTO. REAL SUBJECT FIRST.
+YOU ARE GENERATING A REAL PHOTOGRAPH — NOT ARTWORK.
+
+Ultra realistic photograph of a fluffy ${englishSubject}
+peeking through a soft circular opening made ONLY from clouds and snow.
+expression: ${randomVariation}.
+
+The subject is alive, natural, and dominant in the frame.
+The animal is partially inside the cloud hole emerging toward the camera.
+
+STYLE:
+real photography, organic natural shapes, soft fluffy textures, realistic fur detail, macro photography, emotional cuteness realism, pastel blue minimal background.
+
+COMPOSITION:
+subject centered, face dominant, close-up portrait, subject closer than environment, environment supports subject only.
+
+LIGHTING:
+soft studio light, gentle shadows, shallow depth of field, photographic realism, 8k detail.
+
+ABSOLUTELY NO STRUCTURES OR SCENES.`;
+                
+                // KUSURSUZ NEGATİF PROMPT
+                const negativePrompt = `frame, border, window, box, cube, shadowbox, diorama, paper art, papercraft, paper cut, origami, cardboard, wood, stage, installation, sculpture, illustration, drawing, painting, cartoon, cgi, 3d render, decorative scene`;
+
+                const startRes = await fetch("/api/generate", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ token: cachedApiKey })
+                    body: JSON.stringify({ 
+                        token: cachedApiKey, 
+                        prompt: finalPrompt,
+                        negative_prompt: negativePrompt,
+                        guidance_scale: guidanceScale, 
+                        num_inference_steps: numSteps,
+                        width: 1344, 
+                        height: 768 
+                    })
                 });
-                const pollData = await pollRes.json();
 
-                if (pollData.status === "succeeded") {
-                    resultImg.src = pollData.output[0];
-                    resultImg.style.display = "block";
-                    downloadBtn.style.display = "block";
-                    currentPredictionId = null; 
-                    break;
-                } else if (pollData.status === "failed" || pollData.status === "canceled") {
-                    throw new Error("Üretim iptal edildi veya başarısız oldu.");
+                const startData = await startRes.json();
+                if (startData.error) throw new Error(startData.error);
+                
+                currentPredictionId = startData.id;
+
+                while (currentPredictionId) {
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                    
+                    const pollRes = await fetch(`/api/status/${currentPredictionId}`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ token: cachedApiKey })
+                    });
+                    const pollData = await pollRes.json();
+
+                    if (pollData.status === "succeeded") {
+                        const imgUrl = pollData.output[0];
+                        resultImg.src = imgUrl;
+                        resultImg.style.display = "block";
+                        
+                        await gorseliIndir(imgUrl, `Mug-AI-${englishSubject.replace(/\s+/g, '-')}-var${i}`);
+                        
+                        currentPredictionId = null; 
+                        break;
+                    } else if (pollData.status === "failed" || pollData.status === "canceled") {
+                        throw new Error("Üretim iptal edildi veya başarısız oldu.");
+                    }
                 }
             }
+            
+            progressBar.style.width = "100%";
+            statusEl.innerHTML = "✅ Tüm Otonom Üretimler Tamamlandı!";
 
         } catch (error) {
             console.error("Hata:", error);
             alert("Hata: " + error.message);
         } finally {
-            btn.disabled = false;
-            statusEl.style.display = "none";
+            btnSingle.disabled = false;
+            btnFactory.disabled = false;
+            if(count === 1) statusEl.style.display = "none";
+            isFactoryRunning = false;
             if(currentPredictionId) currentPredictionId = null;
         }
     }
 
-    // Acil Fren Sistemi
+    async function gorseliIndir(imgUrl, filename) {
+        try {
+            const response = await fetch(imgUrl);
+            const blob = await response.blob();
+            const blobUrl = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = blobUrl;
+            a.download = `${filename}.png`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(blobUrl);
+        } catch (e) { 
+            window.open(imgUrl, '_blank'); 
+        }
+    }
+
     window.addEventListener('beforeunload', (event) => {
+        isFactoryRunning = false;
         if (currentPredictionId && cachedApiKey) {
             fetch('/api/cancel', {
                 method: 'POST',
@@ -232,22 +316,6 @@ CAMERA: 85mm lens, studio lighting, shallow depth of field, photographic realism
             });
         }
     });
-
-    async function gorseliIndir() {
-        const imgUrl = document.getElementById('result-img').src;
-        if (!imgUrl) return;
-        try {
-            const response = await fetch(imgUrl);
-            const blob = await response.blob();
-            const blobUrl = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = blobUrl;
-            a.download = `mug-ai-master-${Date.now()}.png`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        } catch (e) { window.open(imgUrl, '_blank'); }
-    }
 </script>
 </body>
 </html>
