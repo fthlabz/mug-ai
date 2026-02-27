@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mug-AI: 3D Kupa Baskı Görsel Üretici</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <style>
+        :root { --primary: #2563eb; --primary-hover: #1d4ed8; --success: #10b981; --success-hover: #059669; --bg: #f8fafc; --card-bg: #ffffff; --text: #0f172a; }
+        body { font-family: 'Inter', system-ui, sans-serif; background-color: var(--bg); color: var(--text); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box; }
+        .app-container { background: var(--card-bg); padding: 40px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); width: 100%; max-width: 500px; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header h1 { margin: 0; font-size: 24px; color: var(--primary); }
+        .header p { margin: 5px 0 0; font-size: 14px; color: #64748b; }
+        .input-group { margin-bottom: 20px; }
+        label { display: block; font-weight: 600; margin-bottom: 8px; font-size: 14px; }
+        input[type="password"], input[type="text"], select { width: 100%; padding: 14px; border-radius: 10px; border: 2px solid #e2e8f0; box-sizing: border-box; font-size: 15px; }
+        button { width: 100%; padding: 16px; background: var(--primary); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; }
+        button:hover { background: var(--primary-hover); }
+        button:disabled { background: #94a3b8; cursor: not-allowed; }
+        #downloadBtn { background: var(--success); margin-top: 15px; display: none; }
+        #downloadBtn:hover { background: var(--success-hover); }
+        .status-message { text-align: center; margin-top: 15px; font-size: 14px; color: #d97706; font-weight: 500; display: none; }
+        .result-container { margin-top: 30px; text-align: center; }
+        #result-img { width: 100%; border-radius: 12px; display: none; border: 4px solid white; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <div class="header">
+        <h1>☕ Mug-AI Studio</h1>
+        <p>Premium 3D Kupa Baskı Görselleri</p>
+    </div>
+
+    <div class="input-group">
+        <label for="gizliPin">Sistem Erişim PIN'i</label>
+        <input type="password" id="gizliPin" placeholder="PIN kodunu girin (Örn: 1453)">
+    </div>
+
+    <div class="input-group">
+        <label for="printSize">Baskı Tipi (Boyut)</label>
+        <select id="printSize">
+            <option value="square">Kare (1024x1024 - Sadece Ön Yüz)</option>
+            <option value="wrap">Geniş (1344x768 - Tüm Kupa Çevresi)</option>
+        </select>
+    </div>
+
+    <div class="input-group">
+        <label for="promptInput">Müşteri Ne İstiyor?</label>
+        <input type="text" id="promptInput" placeholder="Örn: Kahve içen sevimli bir baykuş...">
+    </div>
+
+    <button id="generateBtn" onclick="uretimeBasla()">Görseli Oluştur</button>
+    <div id="status" class="status-message">Üretiliyor, lütfen bekleyin...</div>
+
+    <div class="result-container">
+        <img id="result-img" src="" alt="Üretilen Kupa Baskı Görseli">
+        <button id="downloadBtn" onclick="gorseliIndir()">⬇️ PNG Olarak İndir</button>
+    </div>
+</div>
+
+<script>
+    const sifreliKasa = "U2FsdGVkX1/7ytPepRabsGIChr25zzuga4wkk5q74mbbLrGDZD4VhMKw8mng7QncKmcyJGwPxZ0gAPHu2yEU/w==";
+    
+    // Sabit Prompt
+    const baseStylePrompt = "highly detailed, layered paper-cut shadow box, soft foam/clay texture, 3D diorama";
+
+    async function uretimeBasla() {
+        const pin = document.getElementById('gizliPin').value;
+        const userSubject = document.getElementById('promptInput').value;
+        const printSize = document.getElementById('printSize').value;
+        const btn = document.getElementById('generateBtn');
+        const statusEl = document.getElementById('status');
+        const resultImg = document.getElementById('result-img');
+        const downloadBtn = document.getElementById('downloadBtn');
+
+        if (!pin || !userSubject) { alert("PIN ve konu gerekli!"); return; }
+
+        let width = printSize === "wrap" ? 1344 : 1024;
+        let height = printSize === "wrap" ? 768 : 1024;
+
+        try {
+            // CryptoJS AES Şifre Çözümü
+            const bytes = CryptoJS.AES.decrypt(sifreliKasa, pin);
+            const apiKey = bytes.toString(CryptoJS.enc.Utf8);
+
+            if (!apiKey) { alert("Hatalı PIN!"); return; }
+
+            btn.disabled = true;
+            statusEl.style.display = "block";
+            resultImg.style.display = "none";
+            downloadBtn.style.display = "none";
+            
+            const finalPrompt = `${userSubject}, ${baseStylePrompt}, centered composition, pure white background for mug printing`;
+
+            // Python Backend'e İstek Gönderimi
+            const response = await fetch("/api/generate", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ token: apiKey, prompt: finalPrompt, width: width, height: height })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) throw new Error(data.error || "Sunucu hatası");
+
+            resultImg.src = data.output;
+            resultImg.style.display = "block";
+            downloadBtn.style.display = "block";
+
+        } catch (error) {
+            console.error("Hata:", error);
+            alert("Hata: " + error.message);
+        } finally {
+            btn.disabled = false;
+            statusEl.style.display = "none";
+        }
+    }
+
+    async function gorseliIndir() {
+        const imgUrl = document.getElementById('result-img').src;
+        if (!imgUrl) return;
+        try {
+            const response = await fetch(imgUrl);
+            const blob = await response.blob();
+            const blobUrl = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = blobUrl;
+            a.download = `mug-ai-${Date.now()}.png`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        } catch (e) { window.open(imgUrl, '_blank'); }
+    }
+</script>
+</body>
+</html>
