@@ -6,85 +6,21 @@
     <title>Mug-AI: Dark Studio</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <style>
-        :root { 
-            --bg: #0f172a; 
-            --card-bg: #1e293b; 
-            --text: #f8fafc; 
-            --primary: #3b82f6; 
-            --primary-hover: #2563eb; 
-            --success: #10b981; 
-        }
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            background-color: var(--bg); 
-            color: var(--text); 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            height: 100vh; 
-            margin: 0; 
-            overflow: hidden; 
-        }
-        .app-container { 
-            background: var(--card-bg); 
-            padding: 30px; 
-            border-radius: 16px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
-            width: 95vw; 
-            max-width: 600px; 
-            height: 90vh; 
-            display: flex; 
-            flex-direction: column;
-            box-sizing: border-box;
-        }
+        :root { --bg: #0f172a; --card-bg: #1e293b; --text: #f8fafc; --primary: #3b82f6; --primary-hover: #2563eb; --success: #10b981; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg); color: var(--text); display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; overflow: hidden; }
+        .app-container { background: var(--card-bg); padding: 30px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 95vw; max-width: 600px; height: 90vh; display: flex; flex-direction: column; box-sizing: border-box; }
         .header { text-align: center; margin-bottom: 20px; flex-shrink: 0; }
         .header h1 { margin: 0; font-size: 28px; color: var(--primary); }
-        
         label { display: block; font-weight: 600; margin-bottom: 10px; font-size: 18px; }
-        input[type="text"], select { 
-            width: 100%; 
-            padding: 18px; 
-            border-radius: 12px; 
-            border: 2px solid #334155; 
-            background: #0f172a;
-            color: white;
-            box-sizing: border-box; 
-            font-size: 20px; 
-            margin-bottom: 20px;
-            flex-shrink: 0;
-        }
+        input[type="text"], select { width: 100%; padding: 18px; border-radius: 12px; border: 2px solid #334155; background: #0f172a; color: white; box-sizing: border-box; font-size: 20px; margin-bottom: 20px; flex-shrink: 0; }
         input:focus, select:focus { outline: none; border-color: var(--primary); }
-        
         .button-group { display: flex; gap: 10px; flex-shrink: 0; }
-        button { 
-            flex: 1;
-            padding: 18px; 
-            background: var(--primary); 
-            color: white; 
-            border: none; 
-            border-radius: 12px; 
-            font-size: 20px; 
-            font-weight: bold; 
-            cursor: pointer; 
-        }
+        button { flex: 1; padding: 18px; background: var(--primary); color: white; border: none; border-radius: 12px; font-size: 20px; font-weight: bold; cursor: pointer; }
         button:hover { background: var(--primary-hover); }
         button:disabled { background: #475569; color: #94a3b8; cursor: not-allowed; }
-        
         #downloadBtn { background: var(--success); display: none; }
         #downloadBtn:hover { background: #059669; }
-
-        .image-box {
-            flex-grow: 1;
-            margin-top: 20px;
-            border: 2px dashed #475569;
-            border-radius: 12px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-            background: #0f172a;
-            overflow: hidden;
-        }
+        .image-box { flex-grow: 1; margin-top: 20px; border: 2px dashed #475569; border-radius: 12px; display: flex; justify-content: center; align-items: center; position: relative; background: #0f172a; overflow: hidden; }
         #status { font-size: 18px; color: #fbbf24; font-weight: bold; display: none; position: absolute; text-align: center; z-index: 10; padding: 10px;}
         #result-img { max-width: 100%; max-height: 100%; display: none; object-fit: contain; z-index: 5; }
     </style>
@@ -103,7 +39,7 @@
     </select>
 
     <label for="promptInput">Ne Üretelim?</label>
-    <input type="text" id="promptInput" placeholder="Örn: Ormanda yürüyen kedi...">
+    <input type="text" id="promptInput" placeholder="Örn: Beyaz tatlı bir kedi...">
 
     <div class="button-group">
         <button id="generateBtn" onclick="uretimeBasla()">Üret</button>
@@ -117,9 +53,12 @@
 </div>
 
 <script>
-    // Şifreli Kasa ve Arka Planda Çalışan Sabit Hayalet PIN
+    // Hayalet Kilit
     const sifreliKasa = "U2FsdGVkX1/7ytPepRabsGIChr25zzuga4wkk5q74mbbLrGDZD4VhMKw8mng7QncKmcyJGwPxZ0gAPHu2yEU/w==";
     const gizliPin = "1453"; 
+    
+    let currentPredictionId = null;
+    let cachedApiKey = null;
 
     async function uretimeBasla() {
         const userSubject = document.getElementById('promptInput').value;
@@ -135,52 +74,73 @@
         let height = printSize === "wrap" ? 768 : 1024;
 
         try {
-            // Arka planda sessiz şifre çözme
             const bytes = CryptoJS.AES.decrypt(sifreliKasa, gizliPin);
-            const apiKey = bytes.toString(CryptoJS.enc.Utf8);
+            cachedApiKey = bytes.toString(CryptoJS.enc.Utf8);
 
-            if (!apiKey) { alert("Sistem kilit hatası!"); return; }
+            if (!cachedApiKey) { alert("Sistem kilit hatası!"); return; }
 
-            // Arayüzü kilitle ve çeviri durumunu göster
             btn.disabled = true;
             resultImg.style.display = "none";
             downloadBtn.style.display = "none";
             statusEl.innerHTML = "Türkçe girdi İngilizce'ye çevriliyor... 🇹🇷 ➔ 🇬🇧";
             statusEl.style.display = "block";
 
-            // 1. ADIM: Otomatik Türkçe -> İngilizce Çeviri (Ücretsiz API)
             let englishSubject = userSubject;
             try {
                 const trRes = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(userSubject)}&langpair=tr|en`);
                 const trData = await trRes.json();
                 if(trData && trData.responseData && trData.responseData.translatedText) {
                     englishSubject = trData.responseData.translatedText;
-                    console.log("Çeviri Başarılı:", englishSubject); // Geliştirici konsolunda görmek için
                 }
-            } catch(e) {
-                console.warn("Çeviri servisi yanıt vermedi, doğrudan orijinal metin deneniyor.");
-            }
+            } catch(e) { console.warn("Çeviri başarısız."); }
 
-            // 2. ADIM: İngilizce Çeviriyi Mükemmel Prompt'a Yerleştirme
             statusEl.innerHTML = "Gerçekçi 3D Görsel İşleniyor (Bu işlem 15-30 sn sürebilir)... ⏳";
             
-            const finalPrompt = `Highly detailed, intricate layered paper-cut shadow box art style, meticulously crafted with soft-textured, opaque foam and clay-like material, primarily in light blues and whites, as established in image_1.png. Centered within this aperture with complex layered paper edges that create intricate geometric patterns and simulate soft snow-like forms, as seen in image_2.png, ${englishSubject} is positioned, peering directly forward with a captivating presence. Paws (or base of the structure) are resting on a lower smooth ledge, framed by intricate forest elements similar to image_1.png. The subject is tightly framed by intricate layered paper edges that create intricate geometric patterns and simulate soft snow-like forms. Soft, diffused lighting emphasizes the layered depths and soft textures, casting delicate shadows. Whimsical, diorama-like quality. High-resolution photo with shallow depth of field focusing on the subject.`;
+            // Konu tamamen GERÇEKÇİ, etrafı tamamen KÖPÜK/DİORAMA
+            const finalPrompt = `A completely photorealistic, hyper-realistic, alive ${englishSubject} emerging from the center. The subject is NOT paper, possessing real texture and depth. The surrounding frame is a highly detailed, layered paper-cut shadow box, soft foam/clay texture, 3D diorama. The frame is primarily in light blues and whites, with complex layered foam edges creating intricate geometric patterns and simulating soft snow-like forms. Extreme 3D depth, soft diffused lighting, adorable and captivating, 8k resolution cinematic.`;
+            
+            // Konuyu kağıt yapmasını kesin olarak engelleyen NEGATİF prompt
+            const negativePrompt = "paper subject, paper-cut animal, flat, 2d, drawing, painting, illustration, skinny, deformed, ugly, poorly drawn, blurry, low resolution, cartoon, anime, text, watermark";
 
-            // 3. ADIM: Replicate API'ye Gönderim (Flask Backend üzerinden)
-            const response = await fetch("/api/generate", {
+            const startRes = await fetch("/api/generate", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ token: apiKey, prompt: finalPrompt, width: width, height: height })
+                body: JSON.stringify({ 
+                    token: cachedApiKey, 
+                    prompt: finalPrompt,
+                    negative_prompt: negativePrompt,
+                    guidance_scale: 8.0, // Modele promptu ne kadar katı dinlemesi gerektiğini söyler (SDXL için en iyisi)
+                    num_inference_steps: 50, // Kaliteyi artırmak için maksimum adım
+                    width: width, 
+                    height: height 
+                })
             });
 
-            const data = await response.json();
+            const startData = await startRes.json();
+            if (startData.error) throw new Error(startData.error);
+            
+            currentPredictionId = startData.id;
 
-            if (!response.ok) throw new Error(data.error || "Sunucu hatası");
+            while (currentPredictionId) {
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                const pollRes = await fetch(`/api/status/${currentPredictionId}`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ token: cachedApiKey })
+                });
+                const pollData = await pollRes.json();
 
-            // Sonucu Ekrana Basma
-            resultImg.src = data.output;
-            resultImg.style.display = "block";
-            downloadBtn.style.display = "block";
+                if (pollData.status === "succeeded") {
+                    resultImg.src = pollData.output[0];
+                    resultImg.style.display = "block";
+                    downloadBtn.style.display = "block";
+                    currentPredictionId = null; 
+                    break;
+                } else if (pollData.status === "failed" || pollData.status === "canceled") {
+                    throw new Error("Üretim iptal edildi veya başarısız oldu.");
+                }
+            }
 
         } catch (error) {
             console.error("Hata:", error);
@@ -188,8 +148,20 @@
         } finally {
             btn.disabled = false;
             statusEl.style.display = "none";
+            if(currentPredictionId) currentPredictionId = null;
         }
     }
+
+    window.addEventListener('beforeunload', (event) => {
+        if (currentPredictionId && cachedApiKey) {
+            fetch('/api/cancel', {
+                method: 'POST',
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ id: currentPredictionId, token: cachedApiKey }),
+                keepalive: true 
+            });
+        }
+    });
 
     async function gorseliIndir() {
         const imgUrl = document.getElementById('result-img').src;
