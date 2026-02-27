@@ -119,7 +119,7 @@
     </select>
 
     <label for="promptInput">Ne üretmek istiyorsunuz?</label>
-    <input type="text" id="promptInput" placeholder="Örn: Kabe manzarası, Arapça 'Sabır' yazısı, Kedi...">
+    <input type="text" id="promptInput" placeholder="Örn: Papağan, Kabe, Arapça 'Sabır' yazısı...">
 
     <div class="settings-grid">
         <div>
@@ -153,7 +153,6 @@
 </div>
 
 <script>
-    // Hayalet Kilit Mimarisi
     const sifreliKasa = "U2FsdGVkX1/7ytPepRabsGIChr25zzuga4wkk5q74mbbLrGDZD4VhMKw8mng7QncKmcyJGwPxZ0gAPHu2yEU/w==";
     const gizliPin = "1453"; 
     
@@ -218,12 +217,15 @@
                 
                 progressBar.style.width = `${((i - 1) / count) * 100}%`;
 
-                // YENİ VE ÖZGÜR MASTER PROMPT
-                // Kullanıcı ne yazarsa onu merkeze alır, yüksek kalite etiketleri ekler.
-                const finalPrompt = `Masterpiece, ultra detailed, high resolution, professional photography or high quality digital art of: ${englishSubject}. 8k resolution, perfect lighting, clear focus, visually stunning.`;
+                // YENİ PROMPT: Hem çerçeveni korur, hem de nesneni merkeze alır!
+                const finalPrompt = `Masterpiece, ultra realistic photograph. 
+                A stunning view of ${englishSubject}. 
+                The subject is perfectly centered and peeking through a deep, soft circular opening made ONLY from fluffy white clouds and snow. 
+                The fluffy white clouds form a thick 3D frame around the edges of the image, creating a strong shallow depth of field effect. 
+                Blurred fluffy foreground framing the edges, incredibly sharp and detailed ${englishSubject} in the middle. 
+                Studio lighting, macro photography style, magical atmosphere, pastel tones, 8k resolution.`;
                 
-                // İstenmeyen şeyleri (kötü kalite, bulanıklık vs.) engelleyen negatif prompt
-                const negativePrompt = `blurry, low quality, pixelated, ugly, disfigured, bad anatomy, bad composition, watermark, text watermark`;
+                const negativePrompt = `blurry, low quality, pixelated, ugly, disfigured, bad composition, watermark, text watermark`;
 
                 const startRes = await fetch("/api/generate", {
                     method: "POST",
