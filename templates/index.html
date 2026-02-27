@@ -117,7 +117,6 @@
 </div>
 
 <script>
-    // Hayalet Kilit
     const sifreliKasa = "U2FsdGVkX1/7ytPepRabsGIChr25zzuga4wkk5q74mbbLrGDZD4VhMKw8mng7QncKmcyJGwPxZ0gAPHu2yEU/w==";
     const gizliPin = "1453"; 
     
@@ -160,11 +159,11 @@
 
             statusEl.innerHTML = "O pofuduk 3D Görsel İşleniyor (Bu işlem 15-30 sn sürebilir)... ⏳";
             
-            // İŞTE O SİHİRLİ DÜZELTİLMİŞ PROMPT:
-            // Ana obje GERÇEK, Etrafı POFUDUK bulut tüneli
-            const finalPrompt = `Highly detailed volumetric paper-cut style diorama shadow box. Centered, a photorealistic cute fluffy ${englishSubject} peering out directly with striking large blue eyes. The subject is not paper and possesses real texture and depth. The surrounding external aperture is composed of intricate, volumetric layers of chunky soft white pofuduk cloud-like formations and snow crystals, like a cloud tunnel. Integrated soft snowflake accents. Diffused light blue and white lighting creating deep volumetric shadows emphasizing texture. Whimsical and adorable. High resolution. Focus on the realistic subject and volumetric pofuduk clouds.`;
+            // YENİ TERTEMİZ PROMPT: Kâğıt/Kutu kelimeleri tamamen çıkarıldı. Sadece bulut, kar ve gerçekçi obje.
+            const finalPrompt = `A hyper-realistic, highly detailed photorealistic ${englishSubject} peering out from inside a deep, soft circular hole. The hole and surrounding frame are made entirely of fluffy white clouds, soft snow, and frosty ice crystals. Extreme 3D depth, soft pastel blue background behind the clouds, highly adorable, cozy and magical atmosphere, macro photography style, 8k resolution.`;
             
-            const negativePrompt = "paper subject, paper animal, flat, 2d, drawing, painting, illustration, skinny, deformed, ugly, poorly drawn, blurry, low resolution, cartoon, anime, text, watermark";
+            // Kâğıt ve ahşap türevlerini kesin olarak yasaklayan güçlü negatif prompt
+            const negativePrompt = "paper, paper-cut, origami, cardboard, wood, wooden box, stiff frame, square frame, 2d, illustration, drawing, painting, cartoon, flat, ugly, deformed, text, watermark";
 
             const startRes = await fetch("/api/generate", {
                 method: "POST",
