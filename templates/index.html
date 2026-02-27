@@ -119,12 +119,12 @@
     </select>
 
     <label for="promptInput">Ne üretmek istiyorsunuz?</label>
-    <input type="text" id="promptInput" placeholder="Örn: Papağan, Kabe, Arapça 'Sabır' yazısı...">
+    <input type="text" id="promptInput" placeholder="Örn: Papağan, Kabe, Kedi...">
 
     <div class="settings-grid">
         <div>
             <label for="guidanceScale">Guidance Scale (AI Sadakati)</label>
-            <input type="number" id="guidanceScale" value="7.5" step="0.1" min="1" max="20">
+            <input type="number" id="guidanceScale" value="8.0" step="0.1" min="1" max="20">
         </div>
         <div>
             <label for="numSteps">Inference Steps (Kalite)</label>
@@ -217,15 +217,12 @@
                 
                 progressBar.style.width = `${((i - 1) / count) * 100}%`;
 
-                // YENİ PROMPT: Hem çerçeveni korur, hem de nesneni merkeze alır!
-                const finalPrompt = `Masterpiece, ultra realistic photograph. 
-                A stunning view of ${englishSubject}. 
-                The subject is perfectly centered and peeking through a deep, soft circular opening made ONLY from fluffy white clouds and snow. 
-                The fluffy white clouds form a thick 3D frame around the edges of the image, creating a strong shallow depth of field effect. 
-                Blurred fluffy foreground framing the edges, incredibly sharp and detailed ${englishSubject} in the middle. 
-                Studio lighting, macro photography style, magical atmosphere, pastel tones, 8k resolution.`;
+                // --- EN BÜYÜK DEĞİŞİKLİK BURADA ---
+                // "Diorama" ve "Shadow box" hileleriyle dış duvarı zorluyoruz.
+                const finalPrompt = `Macro photography of a thick, fluffy white snow and cloud solid border completely covering all four edges of the image. This fluffy wall creates a physical, deep, circular tunnel hole. Right in the center, looking out from INSIDE this deep white hole, is a highly detailed ${englishSubject}. The fluffy edges in the foreground are heavily blurred (extreme depth of field). 3D diorama style, shadow box concept, perfectly enclosed circular vignette, 8k resolution, masterpiece.`;
                 
-                const negativePrompt = `blurry, low quality, pixelated, ugly, disfigured, bad composition, watermark, text watermark`;
+                // Negatif prompt ile yapay zekanın "doğal açık alan" çizmesini yasaklıyoruz!
+                const negativePrompt = `open sky, natural landscape, outdoors, flat background, missing frame, missing border, cut off frame, blurry subject, low quality`;
 
                 const startRes = await fetch("/api/generate", {
                     method: "POST",
