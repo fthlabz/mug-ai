@@ -53,7 +53,6 @@
 </div>
 
 <script>
-    // Hayalet Kilit
     const sifreliKasa = "U2FsdGVkX1/7ytPepRabsGIChr25zzuga4wkk5q74mbbLrGDZD4VhMKw8mng7QncKmcyJGwPxZ0gAPHu2yEU/w==";
     const gizliPin = "1453"; 
     
@@ -76,7 +75,6 @@
         try {
             const bytes = CryptoJS.AES.decrypt(sifreliKasa, gizliPin);
             cachedApiKey = bytes.toString(CryptoJS.enc.Utf8);
-
             if (!cachedApiKey) { alert("Sistem kilit hatası!"); return; }
 
             btn.disabled = true;
@@ -94,13 +92,13 @@
                 }
             } catch(e) { console.warn("Çeviri başarısız."); }
 
-            statusEl.innerHTML = "Gerçekçi 3D Görsel İşleniyor (Bu işlem 15-30 sn sürebilir)... ⏳";
+            statusEl.innerHTML = "O pofuduk 3D Görsel İşleniyor (15-30 sn)... ⏳";
             
-            // Konu tamamen GERÇEKÇİ, etrafı tamamen KÖPÜK/DİORAMA
-            const finalPrompt = `A completely photorealistic, hyper-realistic, alive ${englishSubject} emerging from the center. The subject is NOT paper, possessing real texture and depth. The surrounding frame is a highly detailed, layered paper-cut shadow box, soft foam/clay texture, 3D diorama. The frame is primarily in light blues and whites, with complex layered foam edges creating intricate geometric patterns and simulating soft snow-like forms. Extreme 3D depth, soft diffused lighting, adorable and captivating, 8k resolution cinematic.`;
+            // İŞTE O SİHİRLİ PROMPT: Konu %100 gerçekçi, çerçeve pofuduk diorama
+            const finalPrompt = `A hyper-realistic, ultra-detailed, living ${englishSubject} with real physical textures, peering out from inside a deep hole. The subject's paws or base are resting gently on the bottom lip of the hole. The surrounding frame and environment are made of highly detailed, layered paper-cut shadow box, soft foam/clay texture, 3D diorama. The frame consists of thick, chunky, soft white and light blue foam-like shapes resembling abstract snow crystals and soft clouds forming a cave aperture. The central subject is entirely real and photorealistic, contrasting perfectly with the soft clay/foam diorama frame. Light blue and white color palette, 8k, extreme 3D depth pop-out effect, highly adorable and cinematic.`;
             
-            // Konuyu kağıt yapmasını kesin olarak engelleyen NEGATİF prompt
-            const negativePrompt = "paper subject, paper-cut animal, flat, 2d, drawing, painting, illustration, skinny, deformed, ugly, poorly drawn, blurry, low resolution, cartoon, anime, text, watermark";
+            // Negatif prompt ile kağıt objeleri kesin olarak engelliyoruz
+            const negativePrompt = "paper animal, paper subject, origami, 2d, illustration, drawing, painting, flat, low quality, abstract subject, stiff frame, wood, metal, plastic, ugly, deformed";
 
             const startRes = await fetch("/api/generate", {
                 method: "POST",
@@ -109,8 +107,8 @@
                     token: cachedApiKey, 
                     prompt: finalPrompt,
                     negative_prompt: negativePrompt,
-                    guidance_scale: 8.0, // Modele promptu ne kadar katı dinlemesi gerektiğini söyler (SDXL için en iyisi)
-                    num_inference_steps: 50, // Kaliteyi artırmak için maksimum adım
+                    guidance_scale: 8.5, 
+                    num_inference_steps: 50,
                     width: width, 
                     height: height 
                 })
@@ -172,7 +170,7 @@
             const blobUrl = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = blobUrl;
-            a.download = `mug-ai-dark-${Date.now()}.png`;
+            a.download = `mug-ai-premium-${Date.now()}.png`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
