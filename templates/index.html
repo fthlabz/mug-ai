@@ -118,13 +118,13 @@
         <option value="square">Kare (Sadece Ön Yüz - 1024x1024)</option>
     </select>
 
-    <label for="promptInput">Ana Karakter (Sadece konuyu yazın)</label>
-    <input type="text" id="promptInput" placeholder="Örn: Beyaz tüylü tatlı bir kedi">
+    <label for="promptInput">Ne üretmek istiyorsunuz?</label>
+    <input type="text" id="promptInput" placeholder="Örn: Kabe manzarası, Arapça 'Sabır' yazısı, Kedi...">
 
     <div class="settings-grid">
         <div>
             <label for="guidanceScale">Guidance Scale (AI Sadakati)</label>
-            <input type="number" id="guidanceScale" value="6.5" step="0.1" min="1" max="20">
+            <input type="number" id="guidanceScale" value="7.5" step="0.1" min="1" max="20">
         </div>
         <div>
             <label for="numSteps">Inference Steps (Kalite)</label>
@@ -160,20 +160,13 @@
     let isFactoryRunning = false;
     let currentPredictionId = null;
     let cachedApiKey = null;
-    let lastGeneratedImgUrl = ""; // Manuel indirme için hafızada tutar
-
-    const emotionVariations = [
-        "happy expression", "sleepy expression", "playful mood", 
-        "curious look", "soft smile", "majestic and calm", 
-        "innocent wide eyes", "gentle gaze", "slightly tilted head", "warm inviting eyes"
-    ];
+    let lastGeneratedImgUrl = ""; 
 
     async function uretimeBasla(count) {
         const userSubject = document.getElementById('promptInput').value;
         const guidanceScale = parseFloat(document.getElementById('guidanceScale').value);
         const numSteps = parseInt(document.getElementById('numSteps').value);
         
-        // Boyut Seçimini API'ye Göndermek İçin Yakalama
         const printSize = document.getElementById('printSize').value;
         const width = printSize === "wrap" ? 1344 : 1024;
         const height = printSize === "wrap" ? 768 : 1024;
@@ -187,7 +180,7 @@
         const dlPngBtn = document.getElementById('downloadPngBtn');
         const dlJpgBtn = document.getElementById('downloadJpgBtn');
 
-        if (!userSubject) { alert("Lütfen ana karakteri yazın!"); return; }
+        if (!userSubject) { alert("Lütfen ne üretmek istediğinizi yazın!"); return; }
 
         try {
             const bytes = CryptoJS.AES.decrypt(sifreliKasa, gizliPin);
@@ -205,13 +198,14 @@
             statusEl.innerHTML = "Çevriliyor... 🇹🇷 ➔ 🇬🇧";
             statusEl.style.display = "block";
             let englishSubject = userSubject;
+            
             try {
                 const trRes = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(userSubject)}&langpair=tr|en`);
                 const trData = await trRes.json();
                 if(trData && trData.responseData && trData.responseData.translatedText) {
                     englishSubject = trData.responseData.translatedText;
                 }
-            } catch(e) { console.warn("Çeviri başarısız."); }
+            } catch(e) { console.warn("Çeviri başarısız, orijinal metin kullanılıyor."); }
 
             for (let i = 1; i <= count; i++) {
                 if (!isFactoryRunning) break;
@@ -224,31 +218,12 @@
                 
                 progressBar.style.width = `${((i - 1) / count) * 100}%`;
 
-                const randomVariation = emotionVariations[Math.floor(Math.random() * emotionVariations.length)];
-
-                // MASTER PROMPT MİMARİSİ
-                const finalPrompt = `MASTERPIECE PHOTO. REAL SUBJECT FIRST.
-YOU ARE GENERATING A REAL PHOTOGRAPH — NOT ARTWORK.
-
-Ultra realistic photograph of a fluffy ${englishSubject}
-peeking through a soft circular opening made ONLY from clouds and snow.
-expression: ${randomVariation}.
-
-The subject is alive, natural, and dominant in the frame.
-The animal is partially inside the cloud hole emerging toward the camera.
-
-STYLE:
-real photography, organic natural shapes, soft fluffy textures, realistic fur detail, macro photography, emotional cuteness realism, pastel blue minimal background.
-
-COMPOSITION:
-subject centered, face dominant, close-up portrait, subject closer than environment, environment supports subject only.
-
-LIGHTING:
-soft studio light, gentle shadows, shallow depth of field, photographic realism, 8k detail.
-
-ABSOLUTELY NO STRUCTURES OR SCENES.`;
+                // YENİ VE ÖZGÜR MASTER PROMPT
+                // Kullanıcı ne yazarsa onu merkeze alır, yüksek kalite etiketleri ekler.
+                const finalPrompt = `Masterpiece, ultra detailed, high resolution, professional photography or high quality digital art of: ${englishSubject}. 8k resolution, perfect lighting, clear focus, visually stunning.`;
                 
-                const negativePrompt = `frame, border, window, box, cube, shadowbox, diorama, paper art, papercraft, paper cut, origami, cardboard, wood, stage, installation, sculpture, illustration, drawing, painting, cartoon, cgi, 3d render, decorative scene`;
+                // İstenmeyen şeyleri (kötü kalite, bulanıklık vs.) engelleyen negatif prompt
+                const negativePrompt = `blurry, low quality, pixelated, ugly, disfigured, bad anatomy, bad composition, watermark, text watermark`;
 
                 const startRes = await fetch("/api/generate", {
                     method: "POST",
@@ -259,8 +234,8 @@ ABSOLUTELY NO STRUCTURES OR SCENES.`;
                         negative_prompt: negativePrompt,
                         guidance_scale: guidanceScale, 
                         num_inference_steps: numSteps,
-                        width: width,  // Seçime göre dinamik
-                        height: height, // Seçime göre dinamik
+                        width: width, 
+                        height: height, 
                         seed: seed
                     })
                 });
@@ -282,18 +257,15 @@ ABSOLUTELY NO STRUCTURES OR SCENES.`;
 
                     if (pollData.status === "succeeded") {
                         const imgUrl = pollData.output[0];
-                        lastGeneratedImgUrl = imgUrl; // Manuel indirme için kaydet
+                        lastGeneratedImgUrl = imgUrl; 
                         
-                        // Ekranda Ön İzleme Gösterme
                         resultImg.src = imgUrl;
                         resultImg.style.display = "block";
                         
                         if(count === 1) {
-                            // Tekli testte butonları aç, kullanıcı seçip indirsin
                             dlPngBtn.style.display = "block";
                             dlJpgBtn.style.display = "block";
                         } else {
-                            // Factory Mode: Kullanıcının resmi görebilmesi için 1.5 saniye bekle, sonra indir
                             await new Promise(res => setTimeout(res, 1500));
                             const dosyaAdi = `Mug-AI-${englishSubject.replace(/\s+/g, '-')}-var${i}-s${seed}`;
                             await indirFormat(imgUrl, dosyaAdi, 'png');
@@ -323,14 +295,12 @@ ABSOLUTELY NO STRUCTURES OR SCENES.`;
         }
     }
 
-    // Arayüzdeki Butonlardan Gelen İndirme Talebi
     async function gorseliIndirManuel(format) {
         if(!lastGeneratedImgUrl) return;
         const filename = `Mug-AI-Single-${Date.now()}`;
         await indirFormat(lastGeneratedImgUrl, filename, format);
     }
 
-    // Yüksek Çözünürlüklü Tuval Motoru ile İndirme (PNG ve Maksimum Kalite JPEG)
     async function indirFormat(imgUrl, filename, format) {
         try {
             const response = await fetch(imgUrl);
@@ -348,12 +318,10 @@ ABSOLUTELY NO STRUCTURES OR SCENES.`;
                     canvas.height = img.height;
                     const ctx = canvas.getContext('2d');
                     
-                    // Şeffaflık (alpha) varsa arka planı beyaz yap
                     ctx.fillStyle = "#FFFFFF";
                     ctx.fillRect(0, 0, canvas.width, canvas.height);
                     ctx.drawImage(img, 0, 0);
                     
-                    // Maksimum Kalitede (1.0) JPEG oluştur
                     canvas.toBlob((jpegBlob) => {
                         const jpegUrl = window.URL.createObjectURL(jpegBlob);
                         tetikleIndirme(jpegUrl, `${filename}.jpg`);
@@ -366,7 +334,6 @@ ABSOLUTELY NO STRUCTURES OR SCENES.`;
         }
     }
 
-    // Tarayıcı İndirme Tetikleyicisi
     function tetikleIndirme(url, dosyaAdi) {
         const a = document.createElement('a');
         a.href = url;
@@ -376,7 +343,6 @@ ABSOLUTELY NO STRUCTURES OR SCENES.`;
         document.body.removeChild(a);
     }
 
-    // Acil Fren Sistemi
     window.addEventListener('beforeunload', (event) => {
         isFactoryRunning = false;
         if (currentPredictionId && cachedApiKey) {
