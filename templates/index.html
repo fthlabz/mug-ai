@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mug-AI: Dark Studio</title>
+    <title>Mug-AI: Master Studio</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <style>
         :root { 
@@ -93,7 +93,7 @@
 
 <div class="app-container">
     <div class="header">
-        <h1>Mug-AI Studio</h1>
+        <h1>Mug-AI Master Studio</h1>
     </div>
 
     <label for="printSize">Baskı Boyutu</label>
@@ -117,6 +117,7 @@
 </div>
 
 <script>
+    // Hayalet Kilit Mimarisi
     const sifreliKasa = "U2FsdGVkX1/7ytPepRabsGIChr25zzuga4wkk5q74mbbLrGDZD4VhMKw8mng7QncKmcyJGwPxZ0gAPHu2yEU/w==";
     const gizliPin = "1453"; 
     
@@ -145,7 +146,7 @@
             btn.disabled = true;
             resultImg.style.display = "none";
             downloadBtn.style.display = "none";
-            statusEl.innerHTML = "Türkçe girdi İngilizce'ye çevriliyor... 🇹🇷 ➔ 🇬🇧";
+            statusEl.innerHTML = "Türkçe girdi çevriliyor... 🇹🇷 ➔ 🇬🇧";
             statusEl.style.display = "block";
 
             let englishSubject = userSubject;
@@ -157,13 +158,18 @@
                 }
             } catch(e) { console.warn("Çeviri başarısız."); }
 
-            statusEl.innerHTML = "O pofuduk 3D Görsel İşleniyor (Bu işlem 15-30 sn sürebilir)... ⏳";
+            statusEl.innerHTML = "Master Görsel İşleniyor (15-30 sn)... ⏳";
             
-            // YENİ TERTEMİZ PROMPT: Kâğıt/Kutu kelimeleri tamamen çıkarıldı. Sadece bulut, kar ve gerçekçi obje.
-            const finalPrompt = `A hyper-realistic, highly detailed photorealistic ${englishSubject} peering out from inside a deep, soft circular hole. The hole and surrounding frame are made entirely of fluffy white clouds, soft snow, and frosty ice crystals. Extreme 3D depth, soft pastel blue background behind the clouds, highly adorable, cozy and magical atmosphere, macro photography style, 8k resolution.`;
+            // PRO LEVEL MASTER PROMPT MİMARİSİ
+            const finalPrompt = `MASTERPIECE PHOTOGRAPH. ULTRA REALISTIC. NOT ARTWORK.
+STYLE RULES (MANDATORY): real photography, highly detailed, layered paper-cut shadow box, soft foam/clay texture, 3D diorama, organic soft materials, natural fluffy texture, living subject focus, minimal environment, no constructed scene, no artistic interpretation.
+SUBJECT: A hyper realistic fluffy ${englishSubject} peeking through a soft circular opening made ONLY of clouds and snow.
+COMPOSITION: subject centered, face dominant, close-up macro shot, subject closer than environment.
+ENVIRONMENT: soft pastel blue background, cloud opening looks natural and alive, no solid structures.
+CAMERA: 85mm lens, studio lighting, shallow depth of field, photographic realism, 8k ultra detailed fur texture, extreme cuteness realism.`;
             
-            // Kâğıt ve ahşap türevlerini kesin olarak yasaklayan güçlü negatif prompt
-            const negativePrompt = "paper, paper-cut, origami, cardboard, wood, wooden box, stiff frame, square frame, 2d, illustration, drawing, painting, cartoon, flat, ugly, deformed, text, watermark";
+            // NEGATIVE MASTER PROMPT
+            const negativePrompt = `frame, square frame, border, box, cube, cardboard, wood, wooden structure, scene design, illustration, cartoon, painting, drawing, cgi scene, 3d render room, stage, fake environment`;
 
             const startRes = await fetch("/api/generate", {
                 method: "POST",
@@ -215,6 +221,7 @@
         }
     }
 
+    // Acil Fren Sistemi
     window.addEventListener('beforeunload', (event) => {
         if (currentPredictionId && cachedApiKey) {
             fetch('/api/cancel', {
@@ -235,7 +242,7 @@
             const blobUrl = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = blobUrl;
-            a.download = `mug-ai-premium-${Date.now()}.png`;
+            a.download = `mug-ai-master-${Date.now()}.png`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
