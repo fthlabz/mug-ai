@@ -14,7 +14,6 @@
             --primary-hover: #2563eb; 
             --success: #10b981; 
         }
-        /* Ekranın kaymasını engelleyen sabit yapı */
         body { 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
             background-color: var(--bg); 
@@ -24,7 +23,7 @@
             align-items: center; 
             height: 100vh; 
             margin: 0; 
-            overflow: hidden; /* Sağa sola veya aşağı kaymayı kesin engeller */
+            overflow: hidden; 
         }
         .app-container { 
             background: var(--card-bg); 
@@ -33,7 +32,7 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
             width: 95vw; 
             max-width: 600px; 
-            height: 90vh; /* Sabit yükseklik */
+            height: 90vh; 
             display: flex; 
             flex-direction: column;
             box-sizing: border-box;
@@ -50,7 +49,7 @@
             background: #0f172a;
             color: white;
             box-sizing: border-box; 
-            font-size: 20px; /* Büyük ve okunaklı yazılar */
+            font-size: 20px; 
             margin-bottom: 20px;
             flex-shrink: 0;
         }
@@ -74,7 +73,6 @@
         #downloadBtn { background: var(--success); display: none; }
         #downloadBtn:hover { background: #059669; }
 
-        /* Resim için sabit ayrılmış alan - yükleme anında sayfayı ittirmez */
         .image-box {
             flex-grow: 1;
             margin-top: 20px;
@@ -87,7 +85,7 @@
             background: #0f172a;
             overflow: hidden;
         }
-        #status { font-size: 20px; color: #fbbf24; font-weight: bold; display: none; position: absolute; text-align: center; z-index: 10; }
+        #status { font-size: 18px; color: #fbbf24; font-weight: bold; display: none; position: absolute; text-align: center; z-index: 10; padding: 10px;}
         #result-img { max-width: 100%; max-height: 100%; display: none; object-fit: contain; z-index: 5; }
     </style>
 </head>
@@ -100,12 +98,12 @@
 
     <label for="printSize">Baskı Boyutu</label>
     <select id="printSize">
-        <option value="square">Kare (Sadece Ön Yüz)</option>
         <option value="wrap">Panoramik (Kupayı Saran)</option>
+        <option value="square">Kare (Sadece Ön Yüz)</option>
     </select>
 
     <label for="promptInput">Ne Üretelim?</label>
-    <input type="text" id="promptInput" placeholder="Örn: Kırmızı bir kurt...">
+    <input type="text" id="promptInput" placeholder="Örn: Ormanda yürüyen kedi...">
 
     <div class="button-group">
         <button id="generateBtn" onclick="uretimeBasla()">Üret</button>
@@ -113,7 +111,7 @@
     </div>
 
     <div class="image-box">
-        <div id="status">Gerçekçi 3D Görsel İşleniyor...</div>
+        <div id="status">Hazırlanıyor...</div>
         <img id="result-img" src="" alt="Sonuç">
     </div>
 </div>
@@ -143,15 +141,32 @@
 
             if (!apiKey) { alert("Sistem kilit hatası!"); return; }
 
-            // Arayüz Modu
+            // Arayüzü kilitle ve çeviri durumunu göster
             btn.disabled = true;
-            statusEl.style.display = "block";
             resultImg.style.display = "none";
             downloadBtn.style.display = "none";
-            
-            // Yeni ve Kusursuz Prompt Mimarisi
-            const finalPrompt = `Highly detailed, intricate layered paper-cut shadow box art style, meticulously crafted with soft-textured, opaque foam and clay-like material, primarily in light blues and whites, as established in image_4.png. Centered within this aperture with complex layered paper edges that create intricate geometric patterns and simulate soft snow-like forms, ${userSubject} is positioned, peering directly forward with a captivating presence. Paws (or base of the structure) are resting on a lower smooth ledge. The subject is tightly framed. Soft, diffused lighting emphasizes the layered depths and soft textures, casting delicate shadows. Whimsical, diorama-like quality. High-resolution photo with shallow depth of field focusing on the subject.`;
+            statusEl.innerHTML = "Türkçe girdi İngilizce'ye çevriliyor... 🇹🇷 ➔ 🇬🇧";
+            statusEl.style.display = "block";
 
+            // 1. ADIM: Otomatik Türkçe -> İngilizce Çeviri (Ücretsiz API)
+            let englishSubject = userSubject;
+            try {
+                const trRes = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(userSubject)}&langpair=tr|en`);
+                const trData = await trRes.json();
+                if(trData && trData.responseData && trData.responseData.translatedText) {
+                    englishSubject = trData.responseData.translatedText;
+                    console.log("Çeviri Başarılı:", englishSubject); // Geliştirici konsolunda görmek için
+                }
+            } catch(e) {
+                console.warn("Çeviri servisi yanıt vermedi, doğrudan orijinal metin deneniyor.");
+            }
+
+            // 2. ADIM: İngilizce Çeviriyi Mükemmel Prompt'a Yerleştirme
+            statusEl.innerHTML = "Gerçekçi 3D Görsel İşleniyor (Bu işlem 15-30 sn sürebilir)... ⏳";
+            
+            const finalPrompt = `Highly detailed, intricate layered paper-cut shadow box art style, meticulously crafted with soft-textured, opaque foam and clay-like material, primarily in light blues and whites, as established in image_1.png. Centered within this aperture with complex layered paper edges that create intricate geometric patterns and simulate soft snow-like forms, as seen in image_2.png, ${englishSubject} is positioned, peering directly forward with a captivating presence. Paws (or base of the structure) are resting on a lower smooth ledge, framed by intricate forest elements similar to image_1.png. The subject is tightly framed by intricate layered paper edges that create intricate geometric patterns and simulate soft snow-like forms. Soft, diffused lighting emphasizes the layered depths and soft textures, casting delicate shadows. Whimsical, diorama-like quality. High-resolution photo with shallow depth of field focusing on the subject.`;
+
+            // 3. ADIM: Replicate API'ye Gönderim (Flask Backend üzerinden)
             const response = await fetch("/api/generate", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -162,6 +177,7 @@
 
             if (!response.ok) throw new Error(data.error || "Sunucu hatası");
 
+            // Sonucu Ekrana Basma
             resultImg.src = data.output;
             resultImg.style.display = "block";
             downloadBtn.style.display = "block";
