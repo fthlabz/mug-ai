@@ -116,6 +116,7 @@
     <select id="printSize">
         <option value="wrap">Panoramik (Kupayı Saran - 1344x768)</option>
         <option value="square">Kare (Sadece Ön Yüz - 1024x1024)</option>
+        <option value="table">Tablo Modu (4724x3543)</option>
     </select>
 
     <label for="promptInput">Ne üretmek istiyorsunuz?</label>
@@ -166,9 +167,21 @@
         const guidanceScale = parseFloat(document.getElementById('guidanceScale').value);
         const numSteps = parseInt(document.getElementById('numSteps').value);
         
+        // 2. DEĞİŞİKLİK: Çözünürlük belirleme mantığı 3 seçeneğe uygun şekilde güncellendi
         const printSize = document.getElementById('printSize').value;
-        const width = printSize === "wrap" ? 1344 : 1024;
-        const height = printSize === "wrap" ? 768 : 1024;
+        let width, height;
+
+        if (printSize === "wrap") {
+            width = 1344;
+            height = 768;
+        } else if (printSize === "table") {
+            width = 4724;
+            height = 3543;
+        } else {
+            // Varsayılan olarak Kare Modu
+            width = 1024;
+            height = 1024;
+        }
 
         const btnSingle = document.getElementById('generateBtn');
         const btnFactory = document.getElementById('factoryBtn');
@@ -217,11 +230,8 @@
                 
                 progressBar.style.width = `${((i - 1) / count) * 100}%`;
 
-                // --- EN BÜYÜK DEĞİŞİKLİK BURADA ---
-                // "Diorama" ve "Shadow box" hileleriyle dış duvarı zorluyoruz.
+                // Promtlar
                 const finalPrompt = `Macro photography of a thick, fluffy white snow and cloud solid border completely covering all four edges of the image. This fluffy wall creates a physical, deep, circular tunnel hole. Right in the center, looking out from INSIDE this deep white hole, is a highly detailed ${englishSubject}. The fluffy edges in the foreground are heavily blurred (extreme depth of field). 3D diorama style, shadow box concept, perfectly enclosed circular vignette, 8k resolution, masterpiece.`;
-                
-                // Negatif prompt ile yapay zekanın "doğal açık alan" çizmesini yasaklıyoruz!
                 const negativePrompt = `open sky, natural landscape, outdoors, flat background, missing frame, missing border, cut off frame, blurry subject, low quality`;
 
                 const startRes = await fetch("/api/generate", {
