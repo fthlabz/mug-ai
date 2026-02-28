@@ -120,7 +120,7 @@
     </select>
 
     <label for="promptInput">Ne üretmek istiyorsunuz?</label>
-    <input type="text" id="promptInput" placeholder="Beyaz yavru kedi">
+    <input type="text" id="promptInput" placeholder="Beyaz yavru geyik">
 
     <div class="settings-grid">
         <div>
@@ -162,25 +162,31 @@
     let cachedApiKey = null;
     let lastGeneratedImgUrl = ""; 
 
+    // Hedef indirilecek çözünürlükleri tutacağımız değişkenler
+    let currentTargetWidth = 1024;
+    let currentTargetHeight = 1024;
+
     async function uretimeBasla(count) {
         const userSubject = document.getElementById('promptInput').value;
         const guidanceScale = parseFloat(document.getElementById('guidanceScale').value);
         const numSteps = parseInt(document.getElementById('numSteps').value);
         
-        // 2. DEĞİŞİKLİK: Çözünürlük belirleme mantığı 3 seçeneğe uygun şekilde güncellendi
         const printSize = document.getElementById('printSize').value;
-        let width, height;
+        
+        let apiWidth, apiHeight;
 
+        // YAPAY ZEKA GÜVENLİK FİLTRESİ: API'ye gidecek ve indirilecek boyutları ayırıyoruz
         if (printSize === "wrap") {
-            width = 1344;
-            height = 768;
+            apiWidth = 1344; apiHeight = 768;
+            currentTargetWidth = 1344; currentTargetHeight = 768;
         } else if (printSize === "table") {
-            width = 4724;
-            height = 3543;
+            // AI sunucularının çökmemesi için aynı oranda (4:3) daha güvenli bir boyut yolluyoruz.
+            apiWidth = 1152; apiHeight = 864; 
+            // İndirme aşamasında senin istediğin esas boyuta çekilecek
+            currentTargetWidth = 4724; currentTargetHeight = 3543;
         } else {
-            // Varsayılan olarak Kare Modu
-            width = 1024;
-            height = 1024;
+            apiWidth = 1024; apiHeight = 1024;
+            currentTargetWidth = 1024; currentTargetHeight = 1024;
         }
 
         const btnSingle = document.getElementById('generateBtn');
@@ -230,7 +236,6 @@
                 
                 progressBar.style.width = `${((i - 1) / count) * 100}%`;
 
-                // Promtlar
                 const finalPrompt = `Macro photography of a thick, fluffy white snow and cloud solid border completely covering all four edges of the image. This fluffy wall creates a physical, deep, circular tunnel hole. Right in the center, looking out from INSIDE this deep white hole, is a highly detailed ${englishSubject}. The fluffy edges in the foreground are heavily blurred (extreme depth of field). 3D diorama style, shadow box concept, perfectly enclosed circular vignette, 8k resolution, masterpiece.`;
                 const negativePrompt = `open sky, natural landscape, outdoors, flat background, missing frame, missing border, cut off frame, blurry subject, low quality`;
 
@@ -243,8 +248,8 @@
                         negative_prompt: negativePrompt,
                         guidance_scale: guidanceScale, 
                         num_inference_steps: numSteps,
-                        width: width, 
-                        height: height, 
+                        width: apiWidth, // API'ye güvenli çözünürlük gidiyor
+                        height: apiHeight, 
                         seed: seed
                     })
                 });
@@ -277,14 +282,14 @@
                         } else {
                             await new Promise(res => setTimeout(res, 1500));
                             const dosyaAdi = `Mug-AI-${englishSubject.replace(/\s+/g, '-')}-var${i}-s${seed}`;
-                            await indirFormat(imgUrl, dosyaAdi, 'png');
-                            await indirFormat(imgUrl, dosyaAdi, 'jpg');
+                            await indirFormat(imgUrl, dosyaAdi, 'png', currentTargetWidth, currentTargetHeight);
+                            await indirFormat(imgUrl, dosyaAdi, 'jpg', currentTargetWidth, currentTargetHeight);
                         }
                         
                         currentPredictionId = null; 
                         break;
                     } else if (pollData.status === "failed" || pollData.status === "canceled") {
-                        throw new Error("Üretim iptal edildi veya başarısız oldu.");
+                        throw new Error("API Sunucusu boyutu çok büyük buldu veya iptal edildi.");
                     }
                 }
             }
@@ -307,37 +312,52 @@
     async function gorseliIndirManuel(format) {
         if(!lastGeneratedImgUrl) return;
         const filename = `Mug-AI-Single-${Date.now()}`;
-        await indirFormat(lastGeneratedImgUrl, filename, format);
+        await indirFormat(lastGeneratedImgUrl, filename, format, currentTargetWidth, currentTargetHeight);
     }
 
-    async function indirFormat(imgUrl, filename, format) {
+    // İNDİRME VE BOYUTLANDIRMA MOTORU GÜNCELLENDİ
+    async function indirFormat(imgUrl, filename, format, tWidth, tHeight) {
         try {
             const response = await fetch(imgUrl);
             const blob = await response.blob();
             const blobUrl = window.URL.createObjectURL(blob);
             
-            if (format === 'png') {
-                tetikleIndirme(blobUrl, `${filename}.png`);
-            } else if (format === 'jpg' || format === 'jpeg') {
-                const img = new Image();
-                img.crossOrigin = "Anonymous";
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    canvas.width = img.width;
-                    canvas.height = img.height;
-                    const ctx = canvas.getContext('2d');
-                    
+            const img = new Image();
+            img.crossOrigin = "Anonymous";
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                // Kullanıcının seçtiği nihai tablo boyutu buraya atanıyor (örn. 4724x3543)
+                canvas.width = tWidth;
+                canvas.height = tHeight;
+                const ctx = canvas.getContext('2d');
+                
+                // Kalite kaybını önlemek için yumuşatma algoritmalarını açıyoruz
+                ctx.imageSmoothingEnabled = true;
+                ctx.imageSmoothingQuality = "high";
+                
+                if (format === 'jpg' || format === 'jpeg') {
                     ctx.fillStyle = "#FFFFFF";
                     ctx.fillRect(0, 0, canvas.width, canvas.height);
-                    ctx.drawImage(img, 0, 0);
-                    
-                    canvas.toBlob((jpegBlob) => {
-                        const jpegUrl = window.URL.createObjectURL(jpegBlob);
-                        tetikleIndirme(jpegUrl, `${filename}.jpg`);
-                    }, 'image/jpeg', 1.0); 
-                };
-                img.src = blobUrl;
-            }
+                } else {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                }
+                
+                // Resmi yeni devasa boyutlarına gerdirerek çiziyoruz
+                ctx.drawImage(img, 0, 0, tWidth, tHeight);
+                
+                const mimeType = format === 'png' ? 'image/png' : 'image/jpeg';
+                canvas.toBlob((finalBlob) => {
+                    const finalUrl = window.URL.createObjectURL(finalBlob);
+                    tetikleIndirme(finalUrl, `${filename}.${format}`);
+                }, mimeType, 1.0); 
+            };
+            
+            img.onerror = () => {
+                // Eğer Canvas işlemi CORS vs. yüzünden hata verirse güvenlik ağı olarak direkt açar
+                window.open(imgUrl, '_blank');
+            };
+            img.src = blobUrl;
+
         } catch (e) {
             window.open(imgUrl, '_blank');
         }
