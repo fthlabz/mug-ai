@@ -119,13 +119,21 @@
         <option value="table">Tablo Modu (4724x3543)</option>
     </select>
 
+    <label for="styleSelect">3D Efekt Stili</label>
+    <select id="styleSelect">
+        <option value="shadowbox">Katmanlı Kağıt Kesimi (Faux 3D Shadow Box)</option>
+        <option value="popout">Dışarı Fırlayan İllüzyon (Faux 3D Pop-Out)</option>
+        <option value="embossed">Seramik/Taş Kabartma (3D Embossed Relief)</option>
+        <option value="tunnel">Pofuduk Derin Tünel (Fluffy Tunnel Hole)</option>
+    </select>
+
     <label for="promptInput">Ne üretmek istiyorsunuz?</label>
-    <input type="text" id="promptInput" placeholder="Beyaz yavru geyik">
+    <input type="text" id="promptInput" placeholder="Örn: Beyaz yavru geyik, kahve içen baykuş...">
 
     <div class="settings-grid">
         <div>
             <label for="guidanceScale">Guidance Scale (AI Sadakati)</label>
-            <input type="number" id="guidanceScale" value="6.5" step="0.1" min="1" max="20">
+            <input type="number" id="guidanceScale" value="7.5" step="0.1" min="1" max="20">
         </div>
         <div>
             <label for="numSteps">Inference Steps (Kalite)</label>
@@ -162,7 +170,6 @@
     let cachedApiKey = null;
     let lastGeneratedImgUrl = ""; 
 
-    // Hedef indirilecek çözünürlükleri tutacağımız değişkenler
     let currentTargetWidth = 1024;
     let currentTargetHeight = 1024;
 
@@ -170,19 +177,16 @@
         const userSubject = document.getElementById('promptInput').value;
         const guidanceScale = parseFloat(document.getElementById('guidanceScale').value);
         const numSteps = parseInt(document.getElementById('numSteps').value);
-        
         const printSize = document.getElementById('printSize').value;
+        const selectedStyle = document.getElementById('styleSelect').value;
         
         let apiWidth, apiHeight;
 
-        // YAPAY ZEKA GÜVENLİK FİLTRESİ: API'ye gidecek ve indirilecek boyutları ayırıyoruz
         if (printSize === "wrap") {
             apiWidth = 1344; apiHeight = 768;
             currentTargetWidth = 1344; currentTargetHeight = 768;
         } else if (printSize === "table") {
-            // AI sunucularının çökmemesi için aynı oranda (4:3) daha güvenli bir boyut yolluyoruz.
             apiWidth = 1152; apiHeight = 864; 
-            // İndirme aşamasında senin istediğin esas boyuta çekilecek
             currentTargetWidth = 4724; currentTargetHeight = 3543;
         } else {
             apiWidth = 1024; apiHeight = 1024;
@@ -236,8 +240,26 @@
                 
                 progressBar.style.width = `${((i - 1) / count) * 100}%`;
 
-                const finalPrompt = `Macro photography of a thick, fluffy white snow and cloud solid border completely covering all four edges of the image. This fluffy wall creates a physical, deep, circular tunnel hole. Right in the center, looking out from INSIDE this deep white hole, is a highly detailed ${englishSubject}. The fluffy edges in the foreground are heavily blurred (extreme depth of field). 3D diorama style, shadow box concept, perfectly enclosed circular vignette, 8k resolution, masterpiece.`;
-                const negativePrompt = `open sky, natural landscape, outdoors, flat background, missing frame, missing border, cut off frame, blurry subject, low quality`;
+                // 3D STİL MOTORU
+                let finalPrompt = "";
+                let negativePrompt = "";
+
+                if (selectedStyle === "shadowbox") {
+                    finalPrompt = `A highly detailed ${englishSubject}, set inside a 3D layered paper-cut shadow box. Multi-layered depth, intricate paper art, faux 3D optical illusion, sharp drop shadows, extreme depth, diorama style, perfect for mug wrap, crisp edges, 8k masterpiece.`;
+                    negativePrompt = `flat, 2d, illustration, drawing, painting, low quality, messy, ugly, distorted, missing frame`;
+                } 
+                else if (selectedStyle === "popout") {
+                    finalPrompt = `${englishSubject} bursting and popping out of the surface. Faux 3D optical illusion, trompe l'oeil effect, stark heavy drop shadows casting on the background, 3D relief pop-out effect, extreme depth of field, hyper-realistic, vivid colors, 8k resolution.`;
+                    negativePrompt = `flat design, 2d, no shadow, dull, bad perspective, cropped, blurry, text, watermark`;
+                }
+                else if (selectedStyle === "embossed") {
+                    finalPrompt = `A highly detailed ${englishSubject} sculpted as a 3D embossed ceramic relief on a smooth surface. Faux 3D texture, strong directional studio lighting, realistic stone or ceramic shadows, tactile depth illusion, elegant minimalist mug design, 8k high contrast.`;
+                    negativePrompt = `flat, colored, painted, 2d, bright colors, busy background, messy, low resolution`;
+                }
+                else if (selectedStyle === "tunnel") {
+                    finalPrompt = `Macro photography of a thick, fluffy white snow and cloud solid border completely covering all four edges of the image. This fluffy wall creates a physical, deep, circular tunnel hole. Right in the center, looking out from INSIDE this deep white hole, is a highly detailed ${englishSubject}. 3D diorama style, perfect optical illusion, 8k resolution.`;
+                    negativePrompt = `open sky, natural landscape, outdoors, flat background, missing frame, cut off frame, blurry subject, low quality`;
+                }
 
                 const startRes = await fetch("/api/generate", {
                     method: "POST",
@@ -248,7 +270,7 @@
                         negative_prompt: negativePrompt,
                         guidance_scale: guidanceScale, 
                         num_inference_steps: numSteps,
-                        width: apiWidth, // API'ye güvenli çözünürlük gidiyor
+                        width: apiWidth, 
                         height: apiHeight, 
                         seed: seed
                     })
@@ -281,7 +303,7 @@
                             dlJpgBtn.style.display = "block";
                         } else {
                             await new Promise(res => setTimeout(res, 1500));
-                            const dosyaAdi = `Mug-AI-${englishSubject.replace(/\s+/g, '-')}-var${i}-s${seed}`;
+                            const dosyaAdi = `Mug-AI-${selectedStyle}-${englishSubject.replace(/\s+/g, '-')}-var${i}-s${seed}`;
                             await indirFormat(imgUrl, dosyaAdi, 'png', currentTargetWidth, currentTargetHeight);
                             await indirFormat(imgUrl, dosyaAdi, 'jpg', currentTargetWidth, currentTargetHeight);
                         }
@@ -289,7 +311,7 @@
                         currentPredictionId = null; 
                         break;
                     } else if (pollData.status === "failed" || pollData.status === "canceled") {
-                        throw new Error("API Sunucusu boyutu çok büyük buldu veya iptal edildi.");
+                        throw new Error("API Sunucusu üretimi reddetti veya iptal edildi.");
                     }
                 }
             }
@@ -311,11 +333,11 @@
 
     async function gorseliIndirManuel(format) {
         if(!lastGeneratedImgUrl) return;
-        const filename = `Mug-AI-Single-${Date.now()}`;
+        const selectedStyle = document.getElementById('styleSelect').value;
+        const filename = `Mug-AI-${selectedStyle}-${Date.now()}`;
         await indirFormat(lastGeneratedImgUrl, filename, format, currentTargetWidth, currentTargetHeight);
     }
 
-    // İNDİRME VE BOYUTLANDIRMA MOTORU GÜNCELLENDİ
     async function indirFormat(imgUrl, filename, format, tWidth, tHeight) {
         try {
             const response = await fetch(imgUrl);
@@ -326,12 +348,10 @@
             img.crossOrigin = "Anonymous";
             img.onload = () => {
                 const canvas = document.createElement('canvas');
-                // Kullanıcının seçtiği nihai tablo boyutu buraya atanıyor (örn. 4724x3543)
                 canvas.width = tWidth;
                 canvas.height = tHeight;
                 const ctx = canvas.getContext('2d');
                 
-                // Kalite kaybını önlemek için yumuşatma algoritmalarını açıyoruz
                 ctx.imageSmoothingEnabled = true;
                 ctx.imageSmoothingQuality = "high";
                 
@@ -342,7 +362,6 @@
                     ctx.clearRect(0, 0, canvas.width, canvas.height);
                 }
                 
-                // Resmi yeni devasa boyutlarına gerdirerek çiziyoruz
                 ctx.drawImage(img, 0, 0, tWidth, tHeight);
                 
                 const mimeType = format === 'png' ? 'image/png' : 'image/jpeg';
@@ -353,7 +372,6 @@
             };
             
             img.onerror = () => {
-                // Eğer Canvas işlemi CORS vs. yüzünden hata verirse güvenlik ağı olarak direkt açar
                 window.open(imgUrl, '_blank');
             };
             img.src = blobUrl;
