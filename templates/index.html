@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mug-AI: SaaS Autonomous Engine Pro</title>
+    <title>Mug-AI: SaaS Autonomous Engine Ultimate</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <style>
         :root { 
@@ -20,7 +20,7 @@
         }
         .app-container { 
             background: var(--card-bg); padding: 30px; border-radius: 16px; 
-            box-shadow: 0 10px 40px rgba(0,0,0,0.6); width: 100%; max-width: 700px; 
+            box-shadow: 0 10px 40px rgba(0,0,0,0.6); width: 100%; max-width: 750px; 
             display: flex; flex-direction: column; box-sizing: border-box;
         }
         .header { text-align: center; margin-bottom: 20px; flex-shrink: 0; }
@@ -33,7 +33,7 @@
             background: #0f172a; color: white; box-sizing: border-box; font-size: 15px; margin-bottom: 15px;
         }
         input:focus, select:focus { outline: none; border-color: var(--primary); }
-        optgroup { font-weight: bold; color: var(--primary); background: #1e293b;}
+        optgroup { font-weight: bold; color: #fbbf24; background: #0f172a;}
         
         .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
         .button-group { display: flex; gap: 10px; flex-shrink: 0; margin-top: 5px; }
@@ -59,7 +59,7 @@
         .image-box {
             flex-grow: 1; margin-top: 15px; border: 2px dashed #475569; border-radius: 12px;
             display: flex; justify-content: center; align-items: center; position: relative;
-            background: #0f172a; overflow: hidden; min-height: 300px;
+            background: #0f172a; overflow: hidden; min-height: 350px;
         }
         #status { font-size: 15px; color: #fbbf24; font-weight: bold; display: none; position: absolute; text-align: center; z-index: 10; padding: 15px; background: rgba(15,23,42,0.8); border-radius: 8px;}
         #result-img { max-width: 100%; max-height: 100%; display: none; object-fit: contain; z-index: 5; }
@@ -70,7 +70,7 @@
 <div class="app-container">
     <div class="header">
         <h1>Mug-AI Autonomous Engine</h1>
-        <p>Pro-Level SaaS Print Generator</p>
+        <p>Pro-Level SaaS Print Generator - Ultimate Edition</p>
     </div>
 
     <label for="printSize">Baskı Boyutu (Çözünürlük)</label>
@@ -82,24 +82,39 @@
 
     <label for="styleSelect">Artistik Stil ve İllüzyon Motoru</label>
     <select id="styleSelect">
-        <optgroup label="🌟 3D İllüzyonlar (Kupa & Tablo)">
-            <option value="shadowbox">Buz/Kağıt Katmanlı Çerçeve (Görseldeki Gibi)</option>
-            <option value="popout">Dışarı Fırlayan İllüzyon (Faux 3D Pop-Out)</option>
-            <option value="embossed">Seramik Taş Kabartma (Sadece Doku, Kupa Çizmez)</option>
-            <option value="tunnel">Rüya Diyarı Tüneli (Büyülü Pofuduk Tünel)</option>
-            <option value="liquidmetal">Sıvı Altın ve Metalik Sıçrama (Premium Lüks)</option>
+        <optgroup label="🌟 3D Optik İllüzyonlar (Faux 3D)">
+            <option value="shadowbox">Buz/Kağıt Katmanlı Çerçeve (Derinlik)</option>
+            <option value="popout">Dışarı Fırlayan İllüzyon (Pop-Out)</option>
+            <option value="embossed">Seramik Taş Kabartma (Rölyef)</option>
+            <option value="tunnel">Rüya Diyarı Tüneli (Büyülü Tünel)</option>
         </optgroup>
-        <optgroup label="🎨 Artistik Tablo & Modern Baskılar">
-            <option value="neoncyber">Neon Hologram (Cyberpunk 3D Parlama)</option>
-            <option value="stainedglass">Muhteşem Vitray Pencere (Işıltılı Cam Sanatı)</option>
-            <option value="doubleexposure">Çift Pozlama (Sihirli Manzara İçi Silüet)</option>
+        <optgroup label="✍️ Tipografi & Yazı Sanatı (Kelime Yazın)">
+            <option value="3dtext">3D Kabartma Harfler</option>
+            <option value="neontext">Siberpunk Neon Duvar Yazısı</option>
+            <option value="vintagetext">1950'ler Nostaljik Retro Poster</option>
+        </optgroup>
+        <optgroup label="🌀 Çılgın Boyutlar & Paradokslar">
+            <option value="portal">Başka Boyuta Açılan Boyut Kapısı (Portal)</option>
+            <option value="escher">İmkansız Geometri Paradoksu (Escher Tarzı)</option>
+            <option value="isometric">İzometrik 3D Minyatür Oyuncak Dünya</option>
+        </optgroup>
+        <optgroup label="🌍 Dünya Sanat Akımları (Premium)">
+            <option value="kintsugi">Japon Kintsugi (Altınla Birleştirilmiş Seramik)</option>
+            <option value="resin">Epoksi Reçine & Alkol Mürekkebi (Lüks Soyut)</option>
+            <option value="ukiyoe">Geleneksel Japon Ahşap Baskı (Ukiyo-e)</option>
+            <option value="steampunk">Steampunk (Pirinç, Çarklar ve Buhar)</option>
+            <option value="popart">Andy Warhol Pop Art Çizgi Roman</option>
+        </optgroup>
+        <optgroup label="🎨 Modern Artistik Tablolar">
+            <option value="neoncyber">Neon Hologram (Siberpunk)</option>
+            <option value="stainedglass">Muhteşem Vitray Pencere (Cam Sanatı)</option>
+            <option value="doubleexposure">Çift Pozlama (İç İçe Geçen Manzara)</option>
             <option value="graffiti">Patlayıcı Sokak Sanatı Graffiti</option>
-            <option value="watercolor">Nostaljik ve Zarif Suluboya</option>
         </optgroup>
     </select>
 
-    <label for="promptInput">Ne üretmek istiyorsunuz?</label>
-    <input type="text" id="promptInput" placeholder="Örn: Mavi gözlü sevimli beyaz yavru kedi...">
+    <label for="promptInput">Ne üretmek veya yazdırmak istiyorsunuz?</label>
+    <input type="text" id="promptInput" placeholder="Örn: Aslan, Kahve Molası, Uzay Gemisi...">
 
     <div class="settings-grid">
         <div>
@@ -189,41 +204,59 @@
                 progressBar.style.width = `${((i - 1) / count) * 100}%`;
 
                 let finalPrompt = ""; 
-                // Evrensel Anti-Mockup Negatif Prompt: Asla bir kupa veya fiziki eşya çizmemesini sağlar. Sadece düz doku/resim verir.
-                let negativePrompt = "mug, cup, handle, coffee cup, physically on a table, 3d object of a mug, mockup, frame on a wall, text, watermark, split image, human hands";
+                let negativePrompt = "mug, cup, handle, coffee cup, physically on a table, 3d object of a mug, mockup, frame on a wall, watermark, human hands, split image, double images";
 
                 switch(selectedStyle) {
+                    // 🌟 3D İllüzyonlar
                     case "shadowbox":
-                        finalPrompt = `A highly detailed ${englishSubject}, looking out from inside a deeply layered 3D cutout frame. The borders are intricately textured with jagged, snowy, frosty or paper-cut edges framing the subject perfectly. Deep 3D shadow box, diorama effect, faux 3D optical illusion, sharp drop shadows. Flat print design filling the whole canvas, pristine quality.`;
-                        break;
+                        finalPrompt = `A highly detailed ${englishSubject}, looking out from inside a deeply layered 3D cutout frame. The borders are intricately textured with jagged, snowy, frosty or paper-cut edges framing the subject perfectly. Deep 3D shadow box, diorama effect, faux 3D optical illusion, sharp drop shadows. Flat print design.`; break;
                     case "popout":
-                        finalPrompt = `${englishSubject} bursting and popping out of the surface. Faux 3D optical illusion, trompe l'oeil effect, stark heavy drop shadows casting on the background, 3D relief pop-out effect, extreme depth of field, vivid colors. Flat printable texture.`;
-                        break;
+                        finalPrompt = `${englishSubject} bursting and popping out of the surface. Faux 3D optical illusion, trompe l'oeil effect, stark heavy drop shadows casting on the background, 3D relief pop-out effect, extreme depth of field, vivid colors. Flat printable texture.`; break;
                     case "embossed":
-                        finalPrompt = `A flat, 2D printable surface texture showing a highly detailed ${englishSubject} sculpted as a 3D embossed ceramic relief. Faux 3D texture, strong directional studio lighting, realistic stone or matte ceramic shadows, tactile depth illusion. Elegant minimalist relief background. NO physical cup, just the flat texture.`;
-                        break;
+                        finalPrompt = `A flat, 2D printable surface texture showing a highly detailed ${englishSubject} sculpted as a 3D embossed ceramic relief. Faux 3D texture, strong directional studio lighting, realistic stone or matte ceramic shadows, tactile depth illusion.`; break;
                     case "tunnel":
-                        finalPrompt = `A surreal, magical dream world fantasy tunnel. The edges are composed of thick, glowing, fluffy ethereal clouds and magical elements creating a deep, physical circular tunnel hole. Right in the center, looking out from INSIDE this deep magical hole, is a highly detailed ${englishSubject}. Faux 3D perfect optical illusion, whimsical, 8k.`;
-                        break;
-                    case "liquidmetal":
-                        finalPrompt = `Luxurious ${englishSubject} formed from swirling liquid metal and explosive gold splatters on a dark, sleek background. Highly reflective, 3D fluid dynamics effect, premium elegant flat design print, dramatic lighting.`;
-                        break;
+                        finalPrompt = `A surreal, magical dream world fantasy tunnel. The edges are composed of thick, glowing, fluffy ethereal clouds creating a deep circular tunnel hole. Right in the center, looking out from INSIDE this deep magical hole, is a highly detailed ${englishSubject}. Faux 3D perfect optical illusion, whimsical, 8k.`; break;
+                    
+                    // ✍️ Tipografi ve Yazı
+                    case "3dtext":
+                        finalPrompt = `3D embossed typography text spelling "${englishSubject}", popping out of a solid minimalist background. Tactile balloon or stone letters, faux 3D print illusion, heavy drop shadows, ultra crisp text rendering, flat print file.`; 
+                        negativePrompt += ", misspelled words, bad lettering, illegible"; break;
+                    case "neontext":
+                        finalPrompt = `Glowing neon sign spelling "${englishSubject}" on a dark cyberpunk brick wall background. Vibrant fluorescent colors, faux 3D pop-out effect, high contrast, flat texture print, pristine typographic rendering.`; 
+                        negativePrompt += ", misspelled words, bad lettering, illegible"; break;
+                    case "vintagetext":
+                        finalPrompt = `1950s retro vintage typography poster featuring the text "${englishSubject}". Distressed texture, nostalgic aesthetic font, bold retro color palette, classic diner or advertising style, flat printable design.`; 
+                        negativePrompt += ", misspelled words, modern look, 3d render"; break;
+
+                    // 🌀 Çılgın Boyutlar
+                    case "portal":
+                        finalPrompt = `A glowing interdimensional portal cracking open on a dark flat surface, revealing a breathtaking world of ${englishSubject} inside the rift. Faux 3D optical illusion, extreme depth, glowing edges, surrealism, flat printable canvas.`; break;
+                    case "escher":
+                        finalPrompt = `Mind-bending impossible geometry optical illusion featuring ${englishSubject}. M.C. Escher style, continuous paradox, interlocking shapes, black and white or muted tones, extreme detail, flat print design.`; break;
+                    case "isometric":
+                        finalPrompt = `Highly detailed isometric 3D miniature diorama of ${englishSubject}. Tilt-shift macro photography effect, tiny toy world aesthetic, faux 3D optical illusion floating on a solid background, flat print.`; break;
+
+                    // 🌍 Dünya Sanat Akımları
+                    case "kintsugi":
+                        finalPrompt = `Beautiful ${englishSubject} formed from cracked matte ceramic, joined with glowing liquid gold veins. Japanese Kintsugi repair art style, luxurious, 3D faux relief texture, elegant flat print.`; break;
+                    case "resin":
+                        finalPrompt = `Abstract luxury epoxy resin art and alcohol ink fluid painting forming the shape of ${englishSubject}. Swirling marble textures, gold foil flakes, vibrant liquid dye blending, high gloss illusion, flat texture print.`; break;
+                    case "ukiyoe":
+                        finalPrompt = `Traditional Japanese Ukiyo-e woodblock print of ${englishSubject}. The Great Wave off Kanagawa style, vintage muted colors, textured paper illusion, aesthetic traditional Asian art, flat illustration.`; break;
+                    case "steampunk":
+                        finalPrompt = `Intricate steampunk mechanical ${englishSubject}, made entirely of brass gears, copper cogs, and glowing steam pipes. Victorian industrial style, 3D faux relief mechanical art, flat print.`; break;
+                    case "popart":
+                        finalPrompt = `Vibrant retro comic book Pop Art of ${englishSubject}. Andy Warhol and Roy Lichtenstein style, bright bold colors, halftone dots, thick black comic outlines, flat printable poster graphic.`; break;
+                    
+                    // 🎨 Modern Tablolar
                     case "neoncyber":
-                        finalPrompt = `Cyberpunk futuristic aesthetic, neon glowing ${englishSubject}. 3D holographic projection popping out, dark background with vibrant glowing pink, blue, and purple neon accents. Optical illusion of depth, high contrast, digital art flat print.`;
-                        break;
+                        finalPrompt = `Cyberpunk futuristic aesthetic, neon glowing ${englishSubject}. 3D holographic projection popping out, dark background with vibrant glowing pink, blue, and purple neon accents. Optical illusion of depth.`; break;
                     case "stainedglass":
-                        finalPrompt = `A stunning intricate stained glass window depicting ${englishSubject}. Vibrant jewel-tone colors, thick dark lead lines, glowing bright light shining through from behind, faux 3D volumetric lighting, highly detailed printable flat texture.`;
-                        break;
+                        finalPrompt = `A stunning intricate stained glass window depicting ${englishSubject}. Vibrant jewel-tone colors, thick dark lead lines, glowing bright light shining through from behind, faux 3D volumetric lighting.`; break;
                     case "doubleexposure":
-                        finalPrompt = `Cinematic double exposure photography blending a perfect silhouette of ${englishSubject} with a breathtaking magical fantasy landscape inside the silhouette. High contrast, surrealism, flat print, masterpiece.`;
-                        negativePrompt += ", messy blending, bad anatomy";
-                        break;
+                        finalPrompt = `Cinematic double exposure photography blending a perfect silhouette of ${englishSubject} with a breathtaking magical fantasy landscape inside the silhouette. High contrast, surrealism, flat print.`; break;
                     case "graffiti":
-                        finalPrompt = `Vibrant, explosive urban graffiti wall art of ${englishSubject}. Spray paint drips, bold street art style, faux 3D pop-out graffiti, highly detailed colorful flat texture, Banksy and Peeta inspired style.`;
-                        break;
-                    case "watercolor":
-                        finalPrompt = `Classic vintage watercolor and ink illustration of ${englishSubject}. Soft pastel tones, detailed elegant linework, splashed watercolor edges fading into a clean background, aesthetic flat print design, high quality illustration.`;
-                        break;
+                        finalPrompt = `Vibrant, explosive urban graffiti wall art of ${englishSubject}. Spray paint drips, bold street art style, faux 3D pop-out graffiti, highly detailed colorful flat texture.`; break;
                 }
 
                 const startRes = await fetch("/api/generate", {
