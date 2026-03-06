@@ -20,12 +20,12 @@ def generate():
     prompt = data.get('prompt')
     negative_prompt = data.get('negative_prompt', "")
     
-    # Boyutlar (Wrap formatı için 1344x768)
+    # Boyutlar
     width = data.get('width', 1344)
     height = data.get('height', 768)
     
-    # Senin belirlediğin Pro ayarlamalar ve Otonom Seed
-    guidance_scale = data.get('guidance_scale', 6.5)
+    # Pro ayarlamalar ve Otonom Seed
+    guidance_scale = data.get('guidance_scale', 7.5)
     num_inference_steps = data.get('num_inference_steps', 50)
     seed = data.get('seed')
 
@@ -49,18 +49,16 @@ def generate():
         "apply_watermark": False
     }
     
-    # Eğer seed geldiyse input'a ekle (Tekil benzersiz üretim için kritik nokta)
     if seed is not None:
         input_data["seed"] = seed
 
-    # Replicate SDXL Modeli Payload'ı
+    # Replicate SDXL Modeli Payload'ı (Stabil ve Faux 3D komutlarına tam itaat eden sürüm)
     payload = {
         "version": "39ed52f2a78e934b3ba6e2a89f5b1c712de7dfea535525255b1aa35c5565e08b",
         "input": input_data
     }
 
     try:
-        # Replicate'e işlemi başlatma emri
         res = requests.post("https://api.replicate.com/v1/predictions", headers=headers, json=payload)
         if res.status_code != 201:
             return jsonify({"error": "Replicate API hatası", "details": res.json()}), 500
@@ -72,7 +70,6 @@ def generate():
 
 @app.route('/api/status/<prediction_id>', methods=['POST'])
 def status(prediction_id):
-    # Arayüz bu adrese sorarak resmin bitip bitmediğini kontrol eder
     api_key = request.json.get('token')
     headers = {"Authorization": f"Token {api_key}"}
     
@@ -84,7 +81,6 @@ def status(prediction_id):
 
 @app.route('/api/cancel', methods=['POST'])
 def cancel():
-    # Sayfa kapanırsa "Acil Fren" buraya gelir ve üretimi durdurarak bakiyeni korur
     data = request.json
     api_key = data.get('token')
     prediction_id = data.get('id')
@@ -100,5 +96,4 @@ def cancel():
         return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
-    # Gunicorn ile Render üzerinde çalışması için port 5000 ayarlı
     app.run(debug=True, host='0.0.0.0', port=5000)
