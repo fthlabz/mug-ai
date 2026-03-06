@@ -73,11 +73,11 @@
         <p>Pro-Level SaaS Print Generator - Ultimate Edition</p>
     </div>
 
-    <label for="printSize">Baskı Boyutu (Çözünürlük)</label>
+    <label for="printSize">Baskı Boyutu (300 DPI Matbaa Standartları)</label>
     <select id="printSize">
-        <option value="wrap">Panoramik (Kupayı Saran - 1344x768)</option>
-        <option value="square">Kare (Sadece Ön Yüz - 1024x1024)</option>
-        <option value="table">Tablo Modu (4724x3543)</option>
+        <option value="wrap">Panoramik Kupa (9x21 cm Tam Tur - 2480x1063 px)</option>
+        <option value="square">Kare (9x9 cm Tek Yön Baskı - 1063x1063 px)</option>
+        <option value="table">Tablo Modu (Devasa Boyut - 4724x3543 px)</option>
     </select>
 
     <label for="styleSelect">Artistik Stil ve İllüzyon Motoru</label>
@@ -94,7 +94,7 @@
             <option value="vintagetext">1950'ler Nostaljik Retro Poster</option>
         </optgroup>
         <optgroup label="🌀 Çılgın Boyutlar & Paradokslar">
-            <option value="portal">Başka Boyuta Açılan Boyut Kapısı (Portal)</option>
+            <option value="portal">Başka Boyuta Açılan Kapı (Portal)</option>
             <option value="escher">İmkansız Geometri Paradoksu (Escher Tarzı)</option>
             <option value="isometric">İzometrik 3D Minyatür Oyuncak Dünya</option>
         </optgroup>
@@ -155,8 +155,8 @@
     let currentPredictionId = null;
     let cachedApiKey = null;
     let lastGeneratedImgUrl = ""; 
-    let currentTargetWidth = 1024;
-    let currentTargetHeight = 1024;
+    let currentTargetWidth = 1063;
+    let currentTargetHeight = 1063;
 
     async function uretimeBasla(count) {
         const userSubject = document.getElementById('promptInput').value;
@@ -166,9 +166,23 @@
         const selectedStyle = document.getElementById('styleSelect').value;
         
         let apiWidth, apiHeight;
-        if (printSize === "wrap") { apiWidth = 1344; apiHeight = 768; currentTargetWidth = 1344; currentTargetHeight = 768; } 
-        else if (printSize === "table") { apiWidth = 1152; apiHeight = 864; currentTargetWidth = 4724; currentTargetHeight = 3543; } 
-        else { apiWidth = 1024; apiHeight = 1024; currentTargetWidth = 1024; currentTargetHeight = 1024; }
+        
+        // --- BOYUT VE ORAN MOTORU (300 DPI BASKI İÇİN) ---
+        if (printSize === "wrap") { 
+            // 9x21 cm oranına (2.33) uyan API üretim çözünürlüğü (Sünmeyi engeller)
+            apiWidth = 1344; apiHeight = 576; 
+            // Matbaa kalitesinde tam 9x21 cm çıktı ebatı
+            currentTargetWidth = 2480; currentTargetHeight = 1063; 
+        } 
+        else if (printSize === "table") { 
+            apiWidth = 1152; apiHeight = 864; 
+            currentTargetWidth = 4724; currentTargetHeight = 3543; 
+        } 
+        else { 
+            // Kare - Tek Yön Düz Baskı (9x9 cm)
+            apiWidth = 1024; apiHeight = 1024; 
+            currentTargetWidth = 1063; currentTargetHeight = 1063; 
+        }
 
         const btnSingle = document.getElementById('generateBtn');
         const btnFactory = document.getElementById('factoryBtn');
@@ -207,7 +221,6 @@
                 let negativePrompt = "mug, cup, handle, coffee cup, physically on a table, 3d object of a mug, mockup, frame on a wall, watermark, human hands, split image, double images";
 
                 switch(selectedStyle) {
-                    // 🌟 3D İllüzyonlar
                     case "shadowbox":
                         finalPrompt = `A highly detailed ${englishSubject}, looking out from inside a deeply layered 3D cutout frame. The borders are intricately textured with jagged, snowy, frosty or paper-cut edges framing the subject perfectly. Deep 3D shadow box, diorama effect, faux 3D optical illusion, sharp drop shadows. Flat print design.`; break;
                     case "popout":
@@ -216,8 +229,6 @@
                         finalPrompt = `A flat, 2D printable surface texture showing a highly detailed ${englishSubject} sculpted as a 3D embossed ceramic relief. Faux 3D texture, strong directional studio lighting, realistic stone or matte ceramic shadows, tactile depth illusion.`; break;
                     case "tunnel":
                         finalPrompt = `A surreal, magical dream world fantasy tunnel. The edges are composed of thick, glowing, fluffy ethereal clouds creating a deep circular tunnel hole. Right in the center, looking out from INSIDE this deep magical hole, is a highly detailed ${englishSubject}. Faux 3D perfect optical illusion, whimsical, 8k.`; break;
-                    
-                    // ✍️ Tipografi ve Yazı
                     case "3dtext":
                         finalPrompt = `3D embossed typography text spelling "${englishSubject}", popping out of a solid minimalist background. Tactile balloon or stone letters, faux 3D print illusion, heavy drop shadows, ultra crisp text rendering, flat print file.`; 
                         negativePrompt += ", misspelled words, bad lettering, illegible"; break;
@@ -227,16 +238,12 @@
                     case "vintagetext":
                         finalPrompt = `1950s retro vintage typography poster featuring the text "${englishSubject}". Distressed texture, nostalgic aesthetic font, bold retro color palette, classic diner or advertising style, flat printable design.`; 
                         negativePrompt += ", misspelled words, modern look, 3d render"; break;
-
-                    // 🌀 Çılgın Boyutlar
                     case "portal":
                         finalPrompt = `A glowing interdimensional portal cracking open on a dark flat surface, revealing a breathtaking world of ${englishSubject} inside the rift. Faux 3D optical illusion, extreme depth, glowing edges, surrealism, flat printable canvas.`; break;
                     case "escher":
                         finalPrompt = `Mind-bending impossible geometry optical illusion featuring ${englishSubject}. M.C. Escher style, continuous paradox, interlocking shapes, black and white or muted tones, extreme detail, flat print design.`; break;
                     case "isometric":
                         finalPrompt = `Highly detailed isometric 3D miniature diorama of ${englishSubject}. Tilt-shift macro photography effect, tiny toy world aesthetic, faux 3D optical illusion floating on a solid background, flat print.`; break;
-
-                    // 🌍 Dünya Sanat Akımları
                     case "kintsugi":
                         finalPrompt = `Beautiful ${englishSubject} formed from cracked matte ceramic, joined with glowing liquid gold veins. Japanese Kintsugi repair art style, luxurious, 3D faux relief texture, elegant flat print.`; break;
                     case "resin":
@@ -247,8 +254,6 @@
                         finalPrompt = `Intricate steampunk mechanical ${englishSubject}, made entirely of brass gears, copper cogs, and glowing steam pipes. Victorian industrial style, 3D faux relief mechanical art, flat print.`; break;
                     case "popart":
                         finalPrompt = `Vibrant retro comic book Pop Art of ${englishSubject}. Andy Warhol and Roy Lichtenstein style, bright bold colors, halftone dots, thick black comic outlines, flat printable poster graphic.`; break;
-                    
-                    // 🎨 Modern Tablolar
                     case "neoncyber":
                         finalPrompt = `Cyberpunk futuristic aesthetic, neon glowing ${englishSubject}. 3D holographic projection popping out, dark background with vibrant glowing pink, blue, and purple neon accents. Optical illusion of depth.`; break;
                     case "stainedglass":
