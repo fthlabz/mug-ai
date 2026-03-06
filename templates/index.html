@@ -3,42 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mug-AI: SaaS Autonomous Engine</title>
+    <title>Mug-AI: SaaS Autonomous Engine Pro</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <style>
         :root { 
-            --bg: #0f172a; 
-            --card-bg: #1e293b; 
-            --text: #f8fafc; 
-            --primary: #3b82f6; 
-            --primary-hover: #2563eb; 
-            --factory: #8b5cf6;
-            --factory-hover: #7c3aed;
-            --success: #10b981; 
-            --warning: #f59e0b;
+            --bg: #0f172a; --card-bg: #1e293b; --text: #f8fafc; 
+            --primary: #3b82f6; --primary-hover: #2563eb; 
+            --factory: #8b5cf6; --factory-hover: #7c3aed;
+            --success: #10b981; --warning: #f59e0b;
         }
         body { 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            background-color: var(--bg); 
-            color: var(--text); 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            min-height: 100vh; 
-            margin: 0; 
-            padding: 20px;
-            box-sizing: border-box;
+            background-color: var(--bg); color: var(--text); 
+            display: flex; justify-content: center; align-items: center; 
+            min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box;
         }
         .app-container { 
-            background: var(--card-bg); 
-            padding: 30px; 
-            border-radius: 16px; 
-            box-shadow: 0 10px 40px rgba(0,0,0,0.6); 
-            width: 100%; 
-            max-width: 650px; 
-            display: flex; 
-            flex-direction: column;
-            box-sizing: border-box;
+            background: var(--card-bg); padding: 30px; border-radius: 16px; 
+            box-shadow: 0 10px 40px rgba(0,0,0,0.6); width: 100%; max-width: 700px; 
+            display: flex; flex-direction: column; box-sizing: border-box;
         }
         .header { text-align: center; margin-bottom: 20px; flex-shrink: 0; }
         .header h1 { margin: 0; font-size: 26px; color: var(--primary); }
@@ -46,31 +29,17 @@
         
         label { display: block; font-weight: 600; margin-bottom: 8px; font-size: 14px; color: #cbd5e1; }
         input[type="text"], input[type="number"], select { 
-            width: 100%; 
-            padding: 14px; 
-            border-radius: 10px; 
-            border: 2px solid #334155; 
-            background: #0f172a;
-            color: white;
-            box-sizing: border-box; 
-            font-size: 16px; 
-            margin-bottom: 15px;
+            width: 100%; padding: 14px; border-radius: 10px; border: 2px solid #334155; 
+            background: #0f172a; color: white; box-sizing: border-box; font-size: 15px; margin-bottom: 15px;
         }
         input:focus, select:focus { outline: none; border-color: var(--primary); }
+        optgroup { font-weight: bold; color: var(--primary); background: #1e293b;}
         
         .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
-        
         .button-group { display: flex; gap: 10px; flex-shrink: 0; margin-top: 5px; }
         button { 
-            flex: 1;
-            padding: 16px; 
-            color: white; 
-            border: none; 
-            border-radius: 10px; 
-            font-size: 16px; 
-            font-weight: bold; 
-            cursor: pointer; 
-            transition: all 0.2s;
+            flex: 1; padding: 16px; color: white; border: none; border-radius: 10px; 
+            font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.2s;
         }
         #generateBtn { background: var(--primary); }
         #generateBtn:hover { background: var(--primary-hover); }
@@ -88,19 +57,11 @@
         .progress-bar { height: 100%; background: var(--factory); width: 0%; transition: width 0.3s; }
 
         .image-box {
-            flex-grow: 1;
-            margin-top: 15px;
-            border: 2px dashed #475569;
-            border-radius: 12px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-            background: #0f172a;
-            overflow: hidden;
-            min-height: 250px;
+            flex-grow: 1; margin-top: 15px; border: 2px dashed #475569; border-radius: 12px;
+            display: flex; justify-content: center; align-items: center; position: relative;
+            background: #0f172a; overflow: hidden; min-height: 300px;
         }
-        #status { font-size: 15px; color: #fbbf24; font-weight: bold; display: none; position: absolute; text-align: center; z-index: 10; padding: 15px;}
+        #status { font-size: 15px; color: #fbbf24; font-weight: bold; display: none; position: absolute; text-align: center; z-index: 10; padding: 15px; background: rgba(15,23,42,0.8); border-radius: 8px;}
         #result-img { max-width: 100%; max-height: 100%; display: none; object-fit: contain; z-index: 5; }
     </style>
 </head>
@@ -119,16 +80,26 @@
         <option value="table">Tablo Modu (4724x3543)</option>
     </select>
 
-    <label for="styleSelect">3D Efekt Stili</label>
+    <label for="styleSelect">Artistik Stil ve İllüzyon Motoru</label>
     <select id="styleSelect">
-        <option value="shadowbox">Katmanlı Kağıt Kesimi (Faux 3D Shadow Box)</option>
-        <option value="popout">Dışarı Fırlayan İllüzyon (Faux 3D Pop-Out)</option>
-        <option value="embossed">Seramik/Taş Kabartma (3D Embossed Relief)</option>
-        <option value="tunnel">Pofuduk Derin Tünel (Fluffy Tunnel Hole)</option>
+        <optgroup label="🌟 3D İllüzyonlar (Kupa & Tablo)">
+            <option value="shadowbox">Buz/Kağıt Katmanlı Çerçeve (Görseldeki Gibi)</option>
+            <option value="popout">Dışarı Fırlayan İllüzyon (Faux 3D Pop-Out)</option>
+            <option value="embossed">Seramik Taş Kabartma (Sadece Doku, Kupa Çizmez)</option>
+            <option value="tunnel">Rüya Diyarı Tüneli (Büyülü Pofuduk Tünel)</option>
+            <option value="liquidmetal">Sıvı Altın ve Metalik Sıçrama (Premium Lüks)</option>
+        </optgroup>
+        <optgroup label="🎨 Artistik Tablo & Modern Baskılar">
+            <option value="neoncyber">Neon Hologram (Cyberpunk 3D Parlama)</option>
+            <option value="stainedglass">Muhteşem Vitray Pencere (Işıltılı Cam Sanatı)</option>
+            <option value="doubleexposure">Çift Pozlama (Sihirli Manzara İçi Silüet)</option>
+            <option value="graffiti">Patlayıcı Sokak Sanatı Graffiti</option>
+            <option value="watercolor">Nostaljik ve Zarif Suluboya</option>
+        </optgroup>
     </select>
 
     <label for="promptInput">Ne üretmek istiyorsunuz?</label>
-    <input type="text" id="promptInput" placeholder="Örn: Beyaz yavru geyik, kahve içen baykuş...">
+    <input type="text" id="promptInput" placeholder="Örn: Mavi gözlü sevimli beyaz yavru kedi...">
 
     <div class="settings-grid">
         <div>
@@ -169,7 +140,6 @@
     let currentPredictionId = null;
     let cachedApiKey = null;
     let lastGeneratedImgUrl = ""; 
-
     let currentTargetWidth = 1024;
     let currentTargetHeight = 1024;
 
@@ -181,23 +151,14 @@
         const selectedStyle = document.getElementById('styleSelect').value;
         
         let apiWidth, apiHeight;
-
-        if (printSize === "wrap") {
-            apiWidth = 1344; apiHeight = 768;
-            currentTargetWidth = 1344; currentTargetHeight = 768;
-        } else if (printSize === "table") {
-            apiWidth = 1152; apiHeight = 864; 
-            currentTargetWidth = 4724; currentTargetHeight = 3543;
-        } else {
-            apiWidth = 1024; apiHeight = 1024;
-            currentTargetWidth = 1024; currentTargetHeight = 1024;
-        }
+        if (printSize === "wrap") { apiWidth = 1344; apiHeight = 768; currentTargetWidth = 1344; currentTargetHeight = 768; } 
+        else if (printSize === "table") { apiWidth = 1152; apiHeight = 864; currentTargetWidth = 4724; currentTargetHeight = 3543; } 
+        else { apiWidth = 1024; apiHeight = 1024; currentTargetWidth = 1024; currentTargetHeight = 1024; }
 
         const btnSingle = document.getElementById('generateBtn');
         const btnFactory = document.getElementById('factoryBtn');
         const statusEl = document.getElementById('status');
         const resultImg = document.getElementById('result-img');
-        const progressContainer = document.getElementById('progressContainer');
         const progressBar = document.getElementById('progressBar');
         const dlPngBtn = document.getElementById('downloadPngBtn');
         const dlJpgBtn = document.getElementById('downloadJpgBtn');
@@ -209,84 +170,79 @@
             cachedApiKey = bytes.toString(CryptoJS.enc.Utf8);
             if (!cachedApiKey) { alert("Sistem kilit hatası!"); return; }
 
-            isFactoryRunning = true;
-            btnSingle.disabled = true;
-            btnFactory.disabled = true;
-            resultImg.style.display = "none";
-            dlPngBtn.style.display = "none";
-            dlJpgBtn.style.display = "none";
-            progressContainer.style.display = count > 1 ? "block" : "none";
+            isFactoryRunning = true; btnSingle.disabled = true; btnFactory.disabled = true;
+            resultImg.style.display = "none"; dlPngBtn.style.display = "none"; dlJpgBtn.style.display = "none";
+            document.getElementById('progressContainer').style.display = count > 1 ? "block" : "none";
 
-            statusEl.innerHTML = "Çevriliyor... 🇹🇷 ➔ 🇬🇧";
-            statusEl.style.display = "block";
+            statusEl.innerHTML = "Çevriliyor... 🇹🇷 ➔ 🇬🇧"; statusEl.style.display = "block";
             let englishSubject = userSubject;
-            
             try {
                 const trRes = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(userSubject)}&langpair=tr|en`);
                 const trData = await trRes.json();
-                if(trData && trData.responseData && trData.responseData.translatedText) {
-                    englishSubject = trData.responseData.translatedText;
-                }
-            } catch(e) { console.warn("Çeviri başarısız, orijinal metin kullanılıyor."); }
+                if(trData && trData.responseData && trData.responseData.translatedText) englishSubject = trData.responseData.translatedText;
+            } catch(e) { console.warn("Çeviri hatası."); }
 
             for (let i = 1; i <= count; i++) {
                 if (!isFactoryRunning) break;
-
                 const seed = Math.floor(Math.random() * 1000000);
-
-                statusEl.innerHTML = count > 1 
-                    ? `OTONOM ÜRETİM<br>Varyasyon: ${i} / ${count} (Seed: ${seed}) ⏳<br><small>Ön izleme sonrası otomatik indiriliyor.</small>` 
-                    : "Master Görsel İşleniyor... ⏳";
-                
+                statusEl.innerHTML = count > 1 ? `OTONOM ÜRETİM<br>Varyasyon: ${i} / ${count} (Seed: ${seed}) ⏳` : "Görsel İşleniyor... ⏳";
                 progressBar.style.width = `${((i - 1) / count) * 100}%`;
 
-                // 3D STİL MOTORU
-                let finalPrompt = "";
-                let negativePrompt = "";
+                let finalPrompt = ""; 
+                // Evrensel Anti-Mockup Negatif Prompt: Asla bir kupa veya fiziki eşya çizmemesini sağlar. Sadece düz doku/resim verir.
+                let negativePrompt = "mug, cup, handle, coffee cup, physically on a table, 3d object of a mug, mockup, frame on a wall, text, watermark, split image, human hands";
 
-                if (selectedStyle === "shadowbox") {
-                    finalPrompt = `A highly detailed ${englishSubject}, set inside a 3D layered paper-cut shadow box. Multi-layered depth, intricate paper art, faux 3D optical illusion, sharp drop shadows, extreme depth, diorama style, perfect for mug wrap, crisp edges, 8k masterpiece.`;
-                    negativePrompt = `flat, 2d, illustration, drawing, painting, low quality, messy, ugly, distorted, missing frame`;
-                } 
-                else if (selectedStyle === "popout") {
-                    finalPrompt = `${englishSubject} bursting and popping out of the surface. Faux 3D optical illusion, trompe l'oeil effect, stark heavy drop shadows casting on the background, 3D relief pop-out effect, extreme depth of field, hyper-realistic, vivid colors, 8k resolution.`;
-                    negativePrompt = `flat design, 2d, no shadow, dull, bad perspective, cropped, blurry, text, watermark`;
-                }
-                else if (selectedStyle === "embossed") {
-                    finalPrompt = `A highly detailed ${englishSubject} sculpted as a 3D embossed ceramic relief on a smooth surface. Faux 3D texture, strong directional studio lighting, realistic stone or ceramic shadows, tactile depth illusion, elegant minimalist mug design, 8k high contrast.`;
-                    negativePrompt = `flat, colored, painted, 2d, bright colors, busy background, messy, low resolution`;
-                }
-                else if (selectedStyle === "tunnel") {
-                    finalPrompt = `Macro photography of a thick, fluffy white snow and cloud solid border completely covering all four edges of the image. This fluffy wall creates a physical, deep, circular tunnel hole. Right in the center, looking out from INSIDE this deep white hole, is a highly detailed ${englishSubject}. 3D diorama style, perfect optical illusion, 8k resolution.`;
-                    negativePrompt = `open sky, natural landscape, outdoors, flat background, missing frame, cut off frame, blurry subject, low quality`;
+                switch(selectedStyle) {
+                    case "shadowbox":
+                        finalPrompt = `A highly detailed ${englishSubject}, looking out from inside a deeply layered 3D cutout frame. The borders are intricately textured with jagged, snowy, frosty or paper-cut edges framing the subject perfectly. Deep 3D shadow box, diorama effect, faux 3D optical illusion, sharp drop shadows. Flat print design filling the whole canvas, pristine quality.`;
+                        break;
+                    case "popout":
+                        finalPrompt = `${englishSubject} bursting and popping out of the surface. Faux 3D optical illusion, trompe l'oeil effect, stark heavy drop shadows casting on the background, 3D relief pop-out effect, extreme depth of field, vivid colors. Flat printable texture.`;
+                        break;
+                    case "embossed":
+                        finalPrompt = `A flat, 2D printable surface texture showing a highly detailed ${englishSubject} sculpted as a 3D embossed ceramic relief. Faux 3D texture, strong directional studio lighting, realistic stone or matte ceramic shadows, tactile depth illusion. Elegant minimalist relief background. NO physical cup, just the flat texture.`;
+                        break;
+                    case "tunnel":
+                        finalPrompt = `A surreal, magical dream world fantasy tunnel. The edges are composed of thick, glowing, fluffy ethereal clouds and magical elements creating a deep, physical circular tunnel hole. Right in the center, looking out from INSIDE this deep magical hole, is a highly detailed ${englishSubject}. Faux 3D perfect optical illusion, whimsical, 8k.`;
+                        break;
+                    case "liquidmetal":
+                        finalPrompt = `Luxurious ${englishSubject} formed from swirling liquid metal and explosive gold splatters on a dark, sleek background. Highly reflective, 3D fluid dynamics effect, premium elegant flat design print, dramatic lighting.`;
+                        break;
+                    case "neoncyber":
+                        finalPrompt = `Cyberpunk futuristic aesthetic, neon glowing ${englishSubject}. 3D holographic projection popping out, dark background with vibrant glowing pink, blue, and purple neon accents. Optical illusion of depth, high contrast, digital art flat print.`;
+                        break;
+                    case "stainedglass":
+                        finalPrompt = `A stunning intricate stained glass window depicting ${englishSubject}. Vibrant jewel-tone colors, thick dark lead lines, glowing bright light shining through from behind, faux 3D volumetric lighting, highly detailed printable flat texture.`;
+                        break;
+                    case "doubleexposure":
+                        finalPrompt = `Cinematic double exposure photography blending a perfect silhouette of ${englishSubject} with a breathtaking magical fantasy landscape inside the silhouette. High contrast, surrealism, flat print, masterpiece.`;
+                        negativePrompt += ", messy blending, bad anatomy";
+                        break;
+                    case "graffiti":
+                        finalPrompt = `Vibrant, explosive urban graffiti wall art of ${englishSubject}. Spray paint drips, bold street art style, faux 3D pop-out graffiti, highly detailed colorful flat texture, Banksy and Peeta inspired style.`;
+                        break;
+                    case "watercolor":
+                        finalPrompt = `Classic vintage watercolor and ink illustration of ${englishSubject}. Soft pastel tones, detailed elegant linework, splashed watercolor edges fading into a clean background, aesthetic flat print design, high quality illustration.`;
+                        break;
                 }
 
                 const startRes = await fetch("/api/generate", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
+                    method: "POST", headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ 
-                        token: cachedApiKey, 
-                        prompt: finalPrompt,
-                        negative_prompt: negativePrompt,
-                        guidance_scale: guidanceScale, 
-                        num_inference_steps: numSteps,
-                        width: apiWidth, 
-                        height: apiHeight, 
-                        seed: seed
+                        token: cachedApiKey, prompt: finalPrompt, negative_prompt: negativePrompt,
+                        guidance_scale: guidanceScale, num_inference_steps: numSteps,
+                        width: apiWidth, height: apiHeight, seed: seed
                     })
                 });
 
                 const startData = await startRes.json();
                 if (startData.error) throw new Error(startData.error);
-                
                 currentPredictionId = startData.id;
 
                 while (currentPredictionId) {
                     await new Promise(resolve => setTimeout(resolve, 2000));
-                    
                     const pollRes = await fetch(`/api/status/${currentPredictionId}`, {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
+                        method: "POST", headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({ token: cachedApiKey })
                     });
                     const pollData = await pollRes.json();
@@ -294,40 +250,29 @@
                     if (pollData.status === "succeeded") {
                         const imgUrl = pollData.output[0];
                         lastGeneratedImgUrl = imgUrl; 
+                        resultImg.src = imgUrl; resultImg.style.display = "block";
                         
-                        resultImg.src = imgUrl;
-                        resultImg.style.display = "block";
-                        
-                        if(count === 1) {
-                            dlPngBtn.style.display = "block";
-                            dlJpgBtn.style.display = "block";
-                        } else {
+                        if(count === 1) { dlPngBtn.style.display = "block"; dlJpgBtn.style.display = "block"; } 
+                        else {
                             await new Promise(res => setTimeout(res, 1500));
                             const dosyaAdi = `Mug-AI-${selectedStyle}-${englishSubject.replace(/\s+/g, '-')}-var${i}-s${seed}`;
                             await indirFormat(imgUrl, dosyaAdi, 'png', currentTargetWidth, currentTargetHeight);
                             await indirFormat(imgUrl, dosyaAdi, 'jpg', currentTargetWidth, currentTargetHeight);
                         }
-                        
-                        currentPredictionId = null; 
-                        break;
+                        currentPredictionId = null; break;
                     } else if (pollData.status === "failed" || pollData.status === "canceled") {
-                        throw new Error("API Sunucusu üretimi reddetti veya iptal edildi.");
+                        throw new Error("Üretim reddetti veya iptal edildi.");
                     }
                 }
             }
-            
             progressBar.style.width = "100%";
             statusEl.innerHTML = count > 1 ? "✅ Fabrika Üretimi Tamamlandı!" : "✅ Üretim Tamam!";
 
-        } catch (error) {
-            console.error("Hata:", error);
-            alert("Hata: " + error.message);
-        } finally {
-            btnSingle.disabled = false;
-            btnFactory.disabled = false;
+        } catch (error) { console.error(error); alert("Hata: " + error.message); } 
+        finally {
+            btnSingle.disabled = false; btnFactory.disabled = false;
             if(count === 1) statusEl.style.display = "none";
-            isFactoryRunning = false;
-            if(currentPredictionId) currentPredictionId = null;
+            isFactoryRunning = false; currentPredictionId = null;
         }
     }
 
@@ -343,61 +288,34 @@
             const response = await fetch(imgUrl);
             const blob = await response.blob();
             const blobUrl = window.URL.createObjectURL(blob);
-            
-            const img = new Image();
-            img.crossOrigin = "Anonymous";
+            const img = new Image(); img.crossOrigin = "Anonymous";
             img.onload = () => {
                 const canvas = document.createElement('canvas');
-                canvas.width = tWidth;
-                canvas.height = tHeight;
+                canvas.width = tWidth; canvas.height = tHeight;
                 const ctx = canvas.getContext('2d');
+                ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = "high";
                 
-                ctx.imageSmoothingEnabled = true;
-                ctx.imageSmoothingQuality = "high";
-                
-                if (format === 'jpg' || format === 'jpeg') {
-                    ctx.fillStyle = "#FFFFFF";
-                    ctx.fillRect(0, 0, canvas.width, canvas.height);
-                } else {
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-                }
-                
+                if (format === 'jpg' || format === 'jpeg') { ctx.fillStyle = "#FFFFFF"; ctx.fillRect(0, 0, canvas.width, canvas.height); } 
+                else { ctx.clearRect(0, 0, canvas.width, canvas.height); }
                 ctx.drawImage(img, 0, 0, tWidth, tHeight);
                 
-                const mimeType = format === 'png' ? 'image/png' : 'image/jpeg';
                 canvas.toBlob((finalBlob) => {
                     const finalUrl = window.URL.createObjectURL(finalBlob);
-                    tetikleIndirme(finalUrl, `${filename}.${format}`);
-                }, mimeType, 1.0); 
+                    const a = document.createElement('a'); a.href = finalUrl; a.download = `${filename}.${format}`;
+                    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+                }, format === 'png' ? 'image/png' : 'image/jpeg', 1.0); 
             };
-            
-            img.onerror = () => {
-                window.open(imgUrl, '_blank');
-            };
+            img.onerror = () => window.open(imgUrl, '_blank');
             img.src = blobUrl;
-
-        } catch (e) {
-            window.open(imgUrl, '_blank');
-        }
+        } catch (e) { window.open(imgUrl, '_blank'); }
     }
 
-    function tetikleIndirme(url, dosyaAdi) {
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = dosyaAdi;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-    }
-
-    window.addEventListener('beforeunload', (event) => {
+    window.addEventListener('beforeunload', () => {
         isFactoryRunning = false;
         if (currentPredictionId && cachedApiKey) {
             fetch('/api/cancel', {
-                method: 'POST',
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ id: currentPredictionId, token: cachedApiKey }),
-                keepalive: true 
+                method: 'POST', headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ id: currentPredictionId, token: cachedApiKey }), keepalive: true 
             });
         }
     });
