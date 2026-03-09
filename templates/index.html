@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Wallpaper-AI: PrintMarkt Global Engine</title>
+    <title>Ultimate Print-AI: Mug, Canvas & Wallpaper Factory</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <style>
         :root { 
@@ -43,32 +43,30 @@
         optgroup { font-weight: bold; color: #fbbf24; background: #0f172a;}
         
         .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
-        .button-group { display: flex; gap: 10px; flex-shrink: 0; margin-top: 5px; }
         button { 
-            flex: 1; padding: 16px; color: white; border: none; border-radius: 10px; 
-            font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.2s;
+            width: 100%; padding: 16px; color: white; border: none; border-radius: 10px; 
+            font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.2s; margin-bottom: 10px;
         }
         #generateBtn { background: var(--primary); }
         #generateBtn:hover { background: var(--primary-hover); }
         
         /* Upscale ve İndirme Butonları */
-        .action-group { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; }
         #upscaleBtn { background: var(--upscale); display: none; }
         #upscaleBtn:hover { background: #db2777; }
         .download-group { display: flex; gap: 10px; display: none; }
-        #downloadPngBtn { background: var(--success); }
-        #downloadJpgBtn { background: var(--warning); }
+        #downloadPngBtn { background: var(--success); flex: 1; margin-bottom: 0;}
+        #downloadJpgBtn { background: var(--warning); flex: 1; margin-bottom: 0;}
         #downloadPngBtn:hover { background: #059669; }
         #downloadJpgBtn:hover { background: #d97706; }
         button:disabled { background: #475569 !important; color: #94a3b8; cursor: not-allowed; }
 
-        .progress-container { margin-top: 15px; display: none; background: #334155; border-radius: 8px; height: 8px; overflow: hidden; }
+        .progress-container { margin-bottom: 15px; display: none; background: #334155; border-radius: 8px; height: 8px; overflow: hidden; }
         .progress-bar { height: 100%; background: var(--upscale); width: 0%; transition: width 0.3s; }
 
         .image-box {
-            flex-grow: 1; margin-top: 15px; border: 2px dashed #475569; border-radius: 12px;
+            flex-grow: 1; margin-bottom: 15px; border: 2px dashed #475569; border-radius: 12px;
             display: flex; justify-content: center; align-items: center; position: relative;
-            background: #0f172a; overflow: hidden; min-height: 400px;
+            background: #0f172a; overflow: hidden; min-height: 350px;
         }
         #status { font-size: 15px; color: #fbbf24; font-weight: bold; display: none; position: absolute; text-align: center; z-index: 10; padding: 15px; background: rgba(15,23,42,0.8); border-radius: 8px;}
         #result-img { max-width: 100%; max-height: 100%; display: none; object-fit: contain; z-index: 5; }
@@ -77,8 +75,7 @@
             body { padding: 10px; }
             .app-container { padding: 20px; margin-top: 10px; border-radius: 12px; }
             .settings-grid { grid-template-columns: 1fr; gap: 10px; } 
-            .button-group, .download-group { flex-direction: column; } 
-            button { width: 100%; }
+            .download-group { flex-direction: column; } 
         }
     </style>
 </head>
@@ -86,36 +83,50 @@
 
 <div class="app-container">
     <div class="header">
-        <h1>Wallpaper-AI Engine</h1>
-        <p>Global Print-on-Demand & Upscale Factory</p>
+        <h1>Ultimate Print-AI Engine</h1>
+        <p>Mug, Canvas & Wallpaper Global Factory</p>
     </div>
 
     <label for="printSize">Baskı Modeli ve Üretim Çıktısı</label>
     <select id="printSize">
-        <option value="seamless">Rulo Duvar Kağıdı (Kusursuz Tekrar Eden Kalıp - 1024x1024)</option>
-        <option value="mural">Mural / Tam Duvar Manzara (Panoramik Tek Parça - 1344x768)</option>
+        <optgroup label="☕ Kupa Bardak (Hızlı Çıktı - Yapay Zeka Büyütmesiz)">
+            <option value="wrap">Panoramik Kupa (9x21 cm Tam Tur - 2480x1063 px)</option>
+            <option value="square">Kare Kupa (Tek Yön Baskı - 1063x1063 px)</option>
+        </optgroup>
+        <optgroup label="🖼️ Kanvas Tablo (Hızlı Çıktı - Yapay Zeka Büyütmesiz)">
+            <option value="table">Dev Kanvas Tablo (4724x3543 px)</option>
+        </optgroup>
+        <optgroup label="🧱 Duvar Kağıdı (Otonom AI Replicate Büyütmeli)">
+            <option value="seamless">Rulo Duvar Kağıdı (Kusursuz Tekrar - Kalite Büyütmeli)</option>
+            <option value="mural">Mural / Tam Duvar Manzara (Panoramik - Kalite Büyütmeli)</option>
+        </optgroup>
     </select>
 
-    <label for="styleSelect">Etsy & Global Duvar Kağıdı Trendleri</label>
+    <label for="styleSelect">Dünyanın En İyi Sanat Akımları</label>
     <select id="styleSelect">
-        <optgroup label="🌿 Botanik & Doğa (En Çok Satanlar)">
+        <optgroup label="☕ Kupa Bardak Sanatları (Optik İllüzyonlar)">
+            <option value="shadowbox">Buz/Kağıt Katmanlı Çerçeve (Derinlik İllüzyonu)</option>
+            <option value="popout">Dışarı Fırlayan İllüzyon (3D Pop-Out)</option>
+            <option value="portal">Başka Boyuta Açılan Kapı (Büyülü Portal)</option>
+            <option value="embossed">Seramik Taş Kabartma (Rölyef Efekti)</option>
+        </optgroup>
+        <optgroup label="🖼️ Kanvas Tablo Sanatları (Premium)">
+            <option value="oilpainting">Rönesans Yağlı Boya (Klasik Müze Eseri)</option>
+            <option value="goldleaf">Modern Soyut Altın Varaklı (Lüks Canvas)</option>
+            <option value="doubleexposure">Çift Pozlama (Sürrealist Fotoğrafçılık)</option>
+            <option value="popart">Andy Warhol Pop Art (Renkli Tablo)</option>
+        </optgroup>
+        <optgroup label="🧱 Duvar Kağıdı Trendleri (Etsy En Çok Satanlar)">
             <option value="darkacademia">Dark Academia Botanik (Karanlık, Zarif, Vintage)</option>
             <option value="chinoiserie">Vintage Chinoiserie (Uzak Doğu Kuşları ve Çiçekler)</option>
-            <option value="tropical">Tropikal Orman (Monstera Yaprakları ve Papağanlar)</option>
-            <option value="bohofloral">Boho Floral (Toprak Tonları, Sulu Boya Çiçekler)</option>
-        </optgroup>
-        <optgroup label="🧸 Çocuk Odası (Nursery)">
-            <option value="scandinaviandiy">İskandinav Minimal Hayvanlar (Sulu Boya)</option>
-            <option value="spaceexplorer">Pastel Uzay ve Gezegenler</option>
-        </optgroup>
-        <optgroup label="🖼️ Mural Manzaralar (Sadece Tablo/Mural Modu)">
-            <option value="mistyforest">Sisli Dağ ve Çam Ormanı Manzarası</option>
-            <option value="vintageengraving">Eski Dünya Haritası (Klasik Gravür Tarzı)</option>
+            <option value="tropical">Tropikal Orman (Monstera ve Papağanlar)</option>
+            <option value="scandinaviandiy">İskandinav Minimal Çocuk Odası (Sulu Boya)</option>
+            <option value="mistyforest">Sisli Dağ ve Çam Ormanı (Sadece Mural İçin)</option>
         </optgroup>
     </select>
 
-    <label for="promptInput">Odak Konusu / Özel İstek (İsteğe Bağlı)</label>
-    <input type="text" id="promptInput" placeholder="Örn: Siyah zemin üzerine altın yapraklar, mavi kuşlar...">
+    <label for="promptInput">Odak Konusu / Ne Üretelim?</label>
+    <input type="text" id="promptInput" placeholder="Örn: Aslan, Kahve Molası, Mavi Kuşlar...">
 
     <div class="settings-grid">
         <div>
@@ -128,9 +139,7 @@
         </div>
     </div>
 
-    <div class="button-group">
-        <button id="generateBtn" onclick="uretimeBasla()">🎨 Tasarımı Üret (Önizleme)</button>
-    </div>
+    <button id="generateBtn" onclick="uretimeBasla()">🎨 Tasarımı Üret</button>
 
     <div class="progress-container" id="progressContainer">
         <div class="progress-bar" id="progressBar"></div>
@@ -141,17 +150,16 @@
         <img id="result-img" src="" alt="Sonuç">
     </div>
 
-    <div class="action-group">
-        <button id="upscaleBtn" onclick="replicateUpscaleYap()">🚀 Yapay Zeka ile HD Büyüt (Replicate)</button>
-        <div class="download-group" id="downloadGroup">
-            <button id="downloadPngBtn" onclick="gorseliIndirManuel('png')">⬇️ 300 DPI PNG İndir</button>
-            <button id="downloadJpgBtn" onclick="gorseliIndirManuel('jpg')">⬇️ 300 DPI JPEG İndir</button>
-        </div>
+    <button id="upscaleBtn" onclick="replicateUpscaleYap()">🚀 Yapay Zeka ile HD Büyüt (Sadece Duvar Kağıdı)</button>
+    
+    <div class="download-group" id="downloadGroup">
+        <button id="downloadPngBtn" onclick="gorseliIndirManuel('png')">⬇️ PNG İndir</button>
+        <button id="downloadJpgBtn" onclick="gorseliIndirManuel('jpg')">⬇️ Yüksek Kalite JPEG İndir</button>
     </div>
 </div>
 
 <script>
-    // Hayalet Kilit: Güvenlik Mimariniz Standarda Uygun Şekilde Korunmuştur
+    // Hayalet Kilit Standart Güvenlik Mimarisi
     const sifreliKasa = "U2FsdGVkX1/7ytPepRabsGIChr25zzuga4wkk5q74mbbLrGDZD4VhMKw8mng7QncKmcyJGwPxZ0gAPHu2yEU/w=="; 
     const gizliPin = "1453"; 
     
@@ -159,8 +167,8 @@
     let lastGeneratedImgUrl = ""; 
     let finalUpscaledImgUrl = "";
     let isProcessing = false;
+    let currentCategory = ""; // "mug_canvas" veya "wallpaper"
 
-    // Şifre Çözücü Fonksiyon
     function getToken() {
         if(cachedApiKey) return cachedApiKey;
         try {
@@ -177,59 +185,71 @@
         const userSubject = document.getElementById('promptInput').value;
         const printSize = document.getElementById('printSize').value;
         const selectedStyle = document.getElementById('styleSelect').value;
+        const guidanceScale = parseFloat(document.getElementById('guidanceScale').value);
+        const numSteps = parseInt(document.getElementById('numSteps').value);
         
-        let apiWidth = printSize === "mural" ? 1344 : 1024;
-        let apiHeight = printSize === "mural" ? 768 : 1024;
+        // API Çözünürlükleri ve Kategori Belirleme
+        let apiWidth = 1024, apiHeight = 1024;
+        
+        if (printSize === "wrap") { apiWidth = 1344; apiHeight = 576; currentCategory = "mug_canvas"; } 
+        else if (printSize === "square") { apiWidth = 1024; apiHeight = 1024; currentCategory = "mug_canvas"; } 
+        else if (printSize === "table") { apiWidth = 1152; apiHeight = 864; currentCategory = "mug_canvas"; } 
+        else if (printSize === "seamless") { apiWidth = 1024; apiHeight = 1024; currentCategory = "wallpaper"; } 
+        else if (printSize === "mural") { apiWidth = 1344; apiHeight = 768; currentCategory = "wallpaper"; }
 
-        const uiElements = {
-            btnGen: document.getElementById('generateBtn'),
-            btnUpscale: document.getElementById('upscaleBtn'),
-            dlGroup: document.getElementById('downloadGroup'),
-            status: document.getElementById('status'),
+        const ui = {
+            btnGen: document.getElementById('generateBtn'), btnUpscale: document.getElementById('upscaleBtn'),
+            dlGroup: document.getElementById('downloadGroup'), status: document.getElementById('status'),
             resultImg: document.getElementById('result-img')
         };
 
+        if (!userSubject) { alert("Lütfen ne üretmek istediğinizi yazın!"); return; }
+
         try {
-            isProcessing = true;
-            uiElements.btnGen.disabled = true;
-            uiElements.btnUpscale.style.display = "none";
-            uiElements.dlGroup.style.display = "none";
-            uiElements.status.innerHTML = "İngilizceye Çevriliyor... 🇹🇷 ➔ 🇬🇧"; 
-            uiElements.status.style.display = "block";
+            isProcessing = true; ui.btnGen.disabled = true;
+            ui.btnUpscale.style.display = "none"; ui.dlGroup.style.display = "none";
+            ui.status.innerHTML = "Çevriliyor... 🇹🇷 ➔ 🇬🇧"; ui.status.style.display = "block";
 
             let englishSubject = userSubject;
-            if(userSubject) {
-                try {
-                    const trRes = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(userSubject)}&langpair=tr|en`);
-                    const trData = await trRes.json();
-                    if(trData?.responseData?.translatedText) englishSubject = trData.responseData.translatedText;
-                } catch(e) { console.warn("Çeviri hatası."); }
-            }
+            try {
+                const trRes = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(userSubject)}&langpair=tr|en`);
+                const trData = await trRes.json();
+                if(trData?.responseData?.translatedText) englishSubject = trData.responseData.translatedText;
+            } catch(e) { console.warn("Çeviri hatası."); }
 
-            uiElements.status.innerHTML = "Tasarım İşleniyor... ⏳";
+            ui.status.innerHTML = "Tasarım İşleniyor... ⏳";
             const seed = Math.floor(Math.random() * 1000000);
             
-            // Duvar Kağıdı Prompt Mühendisliği
+            // Mükemmel Prompt Mühendisliği
             let finalPrompt = "";
-            let basePrompt = englishSubject ? `${englishSubject}, ` : "";
-            let isSeamless = printSize === "seamless" ? "seamless repeating pattern, perfect tileable flat wallpaper texture, " : "flat huge wall mural design, ";
-            let negativePrompt = "mockup, frame, 3d object, human, hands, watermarks, text, ugly, split image";
+            let basePrompt = `${englishSubject}, `;
+            let negativePrompt = "watermark, text, signature, low quality, deformed, ugly";
+            let isSeamless = printSize === "seamless" ? "seamless repeating pattern, perfect tileable flat wallpaper texture, " : "";
 
             switch(selectedStyle) {
-                case "darkacademia": finalPrompt = `${basePrompt}Dark academia botanical wallpaper, moody vintage scientific illustrations of flowers and foliage, deep dark dramatic background, highly detailed luxury art, ${isSeamless} 8k.`; break;
-                case "chinoiserie": finalPrompt = `${basePrompt}Vintage Chinoiserie wallpaper style, elegant traditional asian art, soft pastel background, luxurious flora and fauna, painted aesthetic, ${isSeamless} flat vector illustration.`; break;
-                case "tropical": finalPrompt = `${basePrompt}Lush tropical jungle botanical wallpaper, large monstera leaves, exotic palm fronds, vibrant rich colors, dense foliage, ${isSeamless} flat printable design.`; break;
-                case "bohofloral": finalPrompt = `${basePrompt}Boho floral aesthetic wallpaper, muted earthy tones, terracotta, sage green, oversized abstract watercolor blooming flowers, ${isSeamless} modern art.`; break;
-                case "scandinaviandiy": finalPrompt = `${basePrompt}Cute Scandinavian nursery wallpaper, minimal watercolor aesthetic, soft neutral pastel colors, cozy kids room design, ${isSeamless} flat illustration.`; break;
-                case "spaceexplorer": finalPrompt = `${basePrompt}Magical pastel space and planets nursery wallpaper, cute stars, watercolor milky way, cozy aesthetic, ${isSeamless} beautiful flat print.`; break;
+                // Kupa Stilleri
+                case "shadowbox": finalPrompt = `A highly detailed ${englishSubject}, looking out from inside a deeply layered 3D cutout frame. Deep 3D shadow box, faux 3D optical illusion, flat print design.`; negativePrompt += ", mug, mockup, 3d object"; break;
+                case "popout": finalPrompt = `${englishSubject} bursting and popping out of the surface. Faux 3D optical illusion, 3D relief pop-out effect, flat printable texture.`; negativePrompt += ", mug, mockup"; break;
+                case "portal": finalPrompt = `A glowing interdimensional portal cracking open on a dark flat surface, revealing ${englishSubject} inside. Faux 3D optical illusion, extreme depth, flat canvas.`; negativePrompt += ", mug, mockup"; break;
+                case "embossed": finalPrompt = `A flat printable surface showing a highly detailed ${englishSubject} sculpted as a 3D embossed ceramic relief. Tactile depth illusion.`; negativePrompt += ", mug, mockup"; break;
+                // Tablo Stilleri
+                case "oilpainting": finalPrompt = `A masterpiece Renaissance oil painting of ${englishSubject}. Museum quality fine art, dramatic chiaroscuro lighting, visible brush strokes, rich colors, flat canvas print.`; negativePrompt += ", frame, gallery wall"; break;
+                case "goldleaf": finalPrompt = `Modern abstract luxury canvas art featuring ${englishSubject}. Dark moody background with brilliant glowing gold leaf accents, metallic texture illusion, elegant flat print.`; break;
+                case "doubleexposure": finalPrompt = `Cinematic double exposure photography blending a perfect silhouette of ${englishSubject} with a breathtaking fantasy landscape. High contrast surrealism, flat print.`; break;
+                case "popart": finalPrompt = `Vibrant retro comic book Pop Art of ${englishSubject}. Andy Warhol style, bright bold colors, halftone dots, thick comic outlines, flat poster graphic.`; break;
+                // Duvar Kağıdı Stilleri
+                case "darkacademia": finalPrompt = `${basePrompt}Dark academia botanical wallpaper, moody vintage scientific illustrations of flowers and foliage, deep dark dramatic background, ${isSeamless} 8k.`; break;
+                case "chinoiserie": finalPrompt = `${basePrompt}Vintage Chinoiserie wallpaper style, elegant traditional asian art, soft pastel background, luxurious flora and fauna, ${isSeamless} flat vector illustration.`; break;
+                case "tropical": finalPrompt = `${basePrompt}Lush tropical jungle botanical wallpaper, large monstera leaves, exotic palm fronds, vibrant rich colors, ${isSeamless} flat printable design.`; break;
+                case "scandinaviandiy": finalPrompt = `${basePrompt}Cute Scandinavian nursery wallpaper, minimal watercolor aesthetic, soft neutral pastel colors, ${isSeamless} flat illustration.`; break;
                 case "mistyforest": finalPrompt = `${basePrompt}Foggy pine forest mountain landscape, huge atmospheric wall mural, misty morning panoramic view, watercolor painting style, highly detailed continuous background.`; break;
-                case "vintageengraving": finalPrompt = `${basePrompt}Old world map vintage engraving style, classical etching illustration, highly detailed lines, antique sepia tones, majestic wall mural flat print.`; break;
             }
 
             const startRes = await fetch("/api/generate", {
                 method: "POST", headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ 
                     token: token, prompt: finalPrompt, negative_prompt: negativePrompt,
+                    guidance_scale: guidanceScale, num_inference_steps: numSteps,
                     width: apiWidth, height: apiHeight, seed: seed
                 })
             });
@@ -238,7 +258,6 @@
             if (startData.error) throw new Error(startData.error);
             let currentPredictionId = startData.id;
 
-            // Polling Döngüsü
             while (currentPredictionId) {
                 await new Promise(resolve => setTimeout(resolve, 2000));
                 const pollRes = await fetch(`/api/status/${currentPredictionId}`, {
@@ -249,57 +268,52 @@
 
                 if (pollData.status === "succeeded") {
                     lastGeneratedImgUrl = pollData.output[0]; 
-                    uiElements.resultImg.src = lastGeneratedImgUrl; 
-                    uiElements.resultImg.style.display = "block";
-                    uiElements.btnUpscale.style.display = "block"; // Upscale butonunu göster
-                    uiElements.status.style.display = "none";
+                    ui.resultImg.src = lastGeneratedImgUrl; ui.resultImg.style.display = "block";
+                    ui.status.style.display = "none";
+                    
+                    // Kategoriye Göre Buton Gösterimi
+                    if(currentCategory === "wallpaper") {
+                        ui.btnUpscale.style.display = "block"; // Büyütme iste
+                    } else {
+                        ui.dlGroup.style.display = "flex"; // Direkt indir (Kupa/Tablo)
+                    }
                     break;
                 } else if (pollData.status === "failed") {
                     throw new Error("Üretim reddetti.");
                 }
             }
         } catch (error) { alert("Hata: " + error.message); } 
-        finally {
-            uiElements.btnGen.disabled = false;
-            isProcessing = false;
-        }
+        finally { ui.btnGen.disabled = false; isProcessing = false; }
     }
 
-    // Replicate AI ile Gerçek Büyütme İşlemi
     async function replicateUpscaleYap() {
         if (!lastGeneratedImgUrl || isProcessing) return;
         const token = getToken(); if (!token) return;
 
-        const statusEl = document.getElementById('status');
-        const progContainer = document.getElementById('progressContainer');
-        const progBar = document.getElementById('progressBar');
-        const btnUpscale = document.getElementById('upscaleBtn');
-        const dlGroup = document.getElementById('downloadGroup');
+        const ui = {
+            status: document.getElementById('status'), progCont: document.getElementById('progressContainer'),
+            progBar: document.getElementById('progressBar'), btnUpscale: document.getElementById('upscaleBtn'),
+            dlGroup: document.getElementById('downloadGroup')
+        };
 
         try {
-            isProcessing = true;
-            btnUpscale.disabled = true;
-            statusEl.innerHTML = "Replicate AI Detayları Çiziyor... (Bu işlem 1-2 dk sürebilir) 🚀"; 
-            statusEl.style.display = "block";
-            progContainer.style.display = "block";
+            isProcessing = true; ui.btnUpscale.disabled = true;
+            ui.status.innerHTML = "Replicate AI Detayları Çiziyor... (Bu işlem 1-2 dk sürebilir) 🚀"; 
+            ui.status.style.display = "block"; ui.progCont.style.display = "block";
             
-            // Sahte Progress Bar animasyonu (Kullanıcıyı tutmak için)
             let progress = 0;
             const progressInterval = setInterval(() => {
-                progress += Math.random() * 5;
-                if(progress > 90) progress = 90;
-                progBar.style.width = `${progress}%`;
+                progress += Math.random() * 5; if(progress > 90) progress = 90;
+                ui.progBar.style.width = `${progress}%`;
             }, 1000);
 
-            // Sunucudaki Replicate API Proxy'nize istek atıyoruz
-            // Not: Replicate, tarayıcıdan (Frontend) doğrudan gelen istekleri CORS sebebiyle engeller.
-            // Bu yüzden orijinal sistemindeki gibi /api/upscale isimli bir proxy yoluna gönderiyoruz.
+            // Replicate Payload Hatası Çözümü: image_url yerine genellikle beklenen 'image' anahtarı kullanılır.
             const upscaleRes = await fetch("/api/upscale", {
                 method: "POST", headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ 
                     token: token, 
-                    image_url: lastGeneratedImgUrl,
-                    scale: 4 // Orijinal resmi 4 katına (örn: 1024 -> 4096px) çıkarır ve detay ekler
+                    image: lastGeneratedImgUrl, // String did not match hatasını çözen kritik nokta
+                    scale: 4 
                 })
             });
 
@@ -308,44 +322,59 @@
 
             if (upscaleData.status === "succeeded" || upscaleData.output) {
                 finalUpscaledImgUrl = upscaleData.output;
-                document.getElementById('result-img').src = finalUpscaledImgUrl; // HD versiyonu ekrana bas
-                progBar.style.width = "100%";
-                statusEl.innerHTML = "✅ Büyütme Tamam! Dosya Baskıya Hazır.";
-                btnUpscale.style.display = "none";
-                dlGroup.style.display = "flex"; // İndirme butonlarını aç
+                document.getElementById('result-img').src = finalUpscaledImgUrl; 
+                ui.progBar.style.width = "100%";
+                ui.status.innerHTML = "✅ AI Büyütme Tamam! Dosya Baskıya Hazır.";
+                ui.btnUpscale.style.display = "none";
+                ui.dlGroup.style.display = "flex"; 
             } else {
-                throw new Error("Upscale işlemi başarısız oldu.");
+                throw new Error("Upscale işlemi başarısız oldu veya sunucu yanıtı hatalı.");
             }
 
         } catch (error) { 
             alert("Büyütme Hatası: " + error.message); 
-            statusEl.style.display = "none";
-            btnUpscale.disabled = false;
+            ui.status.style.display = "none"; ui.btnUpscale.disabled = false;
         } finally {
-            setTimeout(() => { progContainer.style.display = "none"; }, 2000);
+            setTimeout(() => { ui.progCont.style.display = "none"; }, 2000);
             isProcessing = false;
         }
     }
 
-    // Doğal Çözünürlükte İndirme (Sündürmeden)
     async function gorseliIndirManuel(format) {
-        if(!finalUpscaledImgUrl) return;
+        // Hangi görseli indireceğiz? Duvar kağıdı ise büyütülmüşü, Kupa/Tablo ise orijinali.
+        const sourceUrl = currentCategory === "wallpaper" ? finalUpscaledImgUrl : lastGeneratedImgUrl;
+        if(!sourceUrl) return;
+
+        const printSize = document.getElementById('printSize').value;
         const selectedStyle = document.getElementById('styleSelect').value;
-        const filename = `Wallpaper-AI-${selectedStyle}-${Date.now()}`;
+        const filename = `Ultimate-AI-${printSize}-${selectedStyle}-${Date.now()}`;
         
         try {
-            const response = await fetch(finalUpscaledImgUrl);
+            const response = await fetch(sourceUrl);
             const blob = await response.blob();
             const blobUrl = window.URL.createObjectURL(blob);
             
-            // Doğrudan doğal boyutu ile canvasa aktarıp indiriyoruz. Sündürme (stretch) yok!
             const img = new Image(); img.crossOrigin = "Anonymous";
             img.onload = () => {
                 const canvas = document.createElement('canvas');
-                // Resmin Replicate'ten gelen HD orjinal ölçülerini baz alıyoruz
-                canvas.width = img.naturalWidth; 
-                canvas.height = img.naturalHeight; 
+                let targetWidth, targetHeight;
+
+                // İndirme Stratejisi
+                if (currentCategory === "wallpaper") {
+                    // Duvar kağıdı: AI Büyütmeden gelen orijinal saf pikseller
+                    targetWidth = img.naturalWidth;
+                    targetHeight = img.naturalHeight;
+                } else {
+                    // Kupa ve Tablo: Eski sündürme/matbaa şablonu mantığı
+                    if (printSize === "wrap") { targetWidth = 2480; targetHeight = 1063; }
+                    else if (printSize === "square") { targetWidth = 1063; targetHeight = 1063; }
+                    else if (printSize === "table") { targetWidth = 4724; targetHeight = 3543; }
+                }
+
+                canvas.width = targetWidth; 
+                canvas.height = targetHeight; 
                 const ctx = canvas.getContext('2d');
+                ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = "high";
                 
                 if (format === 'jpg' || format === 'jpeg') { 
                     ctx.fillStyle = "#FFFFFF"; ctx.fillRect(0, 0, canvas.width, canvas.height); 
@@ -359,10 +388,7 @@
                 }, format === 'png' ? 'image/png' : 'image/jpeg', 1.0); 
             };
             img.src = blobUrl;
-        } catch (e) { 
-            // Eğer CORS veya Blob hatası olursa sekme açarak indirmeyi garantiye al
-            window.open(finalUpscaledImgUrl, '_blank'); 
-        }
+        } catch (e) { window.open(sourceUrl, '_blank'); }
     }
 </script>
 </body>
