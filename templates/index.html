@@ -13,7 +13,6 @@
             --success: #10b981; --warning: #f59e0b;
         }
         
-        /* Sağa sola kaymayı engelleyen kilit */
         html, body {
             overflow-x: hidden;
             max-width: 100vw;
@@ -77,13 +76,12 @@
         #status { font-size: 15px; color: #fbbf24; font-weight: bold; display: none; position: absolute; text-align: center; z-index: 10; padding: 15px; background: rgba(15,23,42,0.8); border-radius: 8px;}
         #result-img { max-width: 100%; max-height: 100%; display: none; object-fit: contain; z-index: 5; }
 
-        /* MOBİL UYUMLULUK (Responsive) KODLARI */
         @media (max-width: 600px) {
             body { padding: 10px; }
             .app-container { padding: 20px; margin-top: 10px; border-radius: 12px; }
             .header h1 { font-size: 22px; }
-            .settings-grid { grid-template-columns: 1fr; gap: 10px; } /* Ayarları alt alta dizer */
-            .button-group, .download-group { flex-direction: column; } /* Butonları telefon için alt alta kasar */
+            .settings-grid { grid-template-columns: 1fr; gap: 10px; } 
+            .button-group, .download-group { flex-direction: column; } 
             button { width: 100%; }
         }
     </style>
@@ -96,43 +94,40 @@
         <p>Pro-Level SaaS Print Generator - Ultimate Edition</p>
     </div>
 
-    <label for="printSize">Baskı Boyutu (300 DPI Matbaa Standartları)</label>
+    <label for="printSize">Baskı Formatı (Akıllı Prompt Motoru Aktif)</label>
     <select id="printSize">
         <option value="wrap">Panoramik Kupa (9x21 cm Tam Tur - 2480x1063 px)</option>
-        <option value="square">Kare (9x9 cm Tek Yön Baskı - 1063x1063 px)</option>
-        <option value="table">Tablo Modu (Devasa Boyut - 4724x3543 px)</option>
+        <option value="square">Kare Kupa / Yastık (Tek Yön Baskı - 1063x1063 px)</option>
+        <option value="table">Devasa Tablo / Kanvas Duvar Sanatı (4724x3543 px)</option>
     </select>
 
     <label for="styleSelect">Artistik Stil ve İllüzyon Motoru</label>
     <select id="styleSelect">
-        <optgroup label="🌟 3D Optik İllüzyonlar (Faux 3D)">
-            <option value="shadowbox">Buz/Kağıt Katmanlı Çerçeve (Derinlik)</option>
-            <option value="popout">Dışarı Fırlayan İllüzyon (Pop-Out)</option>
-            <option value="embossed">Seramik Taş Kabartma (Rölyef)</option>
-            <option value="tunnel">Rüya Diyarı Tüneli (Büyülü Tünel)</option>
+        <optgroup label="🏛️ Dünya Klasikleri (Masterpieces)">
+            <option value="renaissance">Rönesans Ustaları (Da Vinci, Michelangelo Etkisi)</option>
+            <option value="impressionism">Empresyonizm (Van Gogh 'Yıldızlı Gece' Fırça Darbeleri)</option>
+            <option value="surrealism">Sürrealizm (Salvador Dali Rüya Boyutu)</option>
         </optgroup>
-        <optgroup label="✍️ Tipografi & Yazı Sanatı (Kelime Yazın)">
-            <option value="3dtext">3D Kabartma Harfler</option>
-            <option value="neontext">Siberpunk Neon Duvar Yazısı</option>
-            <option value="vintagetext">1950'ler Nostaljik Retro Poster</option>
+        <optgroup label="🔥 Gelmiş Geçmiş En Hype Akımlar">
+            <option value="unrealengine">Unreal Engine 5 (Hiper-Gerçekçi 8K, Ray Tracing)</option>
+            <option value="synthwave">Retro Synthwave 80s (Neon Ağlar ve Günbatımı)</option>
+            <option value="darkfantasy">Karanlık Fantastik RPG (Destansı, Gotik, Elden Ring Tarzı)</option>
+            <option value="cyberpunk">Siberpunk Şehri (Hologramlar & Gelecek Kurgusu)</option>
         </optgroup>
-        <optgroup label="🌀 Çılgın Boyutlar & Paradokslar">
-            <option value="portal">Başka Boyuta Açılan Kapı (Portal)</option>
-            <option value="escher">İmkansız Geometri Paradoksu (Escher Tarzı)</option>
-            <option value="isometric">İzometrik 3D Minyatür Oyuncak Dünya</option>
+        <optgroup label="🌀 Derinlik & 3D İllüzyonlar">
+            <option value="popout">Dışarı Fırlayan İllüzyon (3D Pop-Out)</option>
+            <option value="portal">Başka Boyuta Açılan Büyülü Portal</option>
+            <option value="escher">İmkansız Geometri (Paradoks Döngüleri)</option>
+            <option value="isometric">İzometrik 3D Minyatür Dünya (Tilt-Shift)</option>
+            <option value="embossed">Taş / Seramik Kabartma (Rölyef)</option>
         </optgroup>
-        <optgroup label="🌍 Dünya Sanat Akımları (Premium)">
-            <option value="kintsugi">Japon Kintsugi (Altınla Birleştirilmiş Seramik)</option>
-            <option value="resin">Epoksi Reçine & Alkol Mürekkebi (Lüks Soyut)</option>
-            <option value="ukiyoe">Geleneksel Japon Ahşap Baskı (Ukiyo-e)</option>
-            <option value="steampunk">Steampunk (Pirinç, Çarklar ve Buhar)</option>
-            <option value="popart">Andy Warhol Pop Art Çizgi Roman</option>
-        </optgroup>
-        <optgroup label="🎨 Modern Artistik Tablolar">
-            <option value="neoncyber">Neon Hologram (Siberpunk)</option>
-            <option value="stainedglass">Muhteşem Vitray Pencere (Cam Sanatı)</option>
-            <option value="doubleexposure">Çift Pozlama (İç İçe Geçen Manzara)</option>
+        <optgroup label="🎨 Modern & Dokusal Başyapıtlar">
+            <option value="resin">Lüks Epoksi Reçine & Alkol Mürekkebi</option>
+            <option value="steampunk">Steampunk (Pirinç, Çarklar ve Buhar Teknolojisi)</option>
+            <option value="popart">Andy Warhol Pop Art (Çizgi Roman Estetiği)</option>
             <option value="graffiti">Patlayıcı Sokak Sanatı Graffiti</option>
+            <option value="stainedglass">Muhteşem Vitray (Işık Saçan Cam Sanatı)</option>
+            <option value="doubleexposure">Çift Pozlama (İç İçe Geçen Büyülü Manzara)</option>
         </optgroup>
     </select>
 
@@ -189,18 +184,23 @@
         const selectedStyle = document.getElementById('styleSelect').value;
         
         let apiWidth, apiHeight;
+        let formatModifier = "";
         
+        // Akıllı Format Modifikasyonu
         if (printSize === "wrap") { 
             apiWidth = 1344; apiHeight = 576; 
             currentTargetWidth = 2480; currentTargetHeight = 1063; 
+            formatModifier = "seamless panoramic wrap-around print design, wide horizontal landscape, perfectly distributed composition, ";
         } 
         else if (printSize === "table") { 
             apiWidth = 1152; apiHeight = 864; 
             currentTargetWidth = 4724; currentTargetHeight = 3543; 
+            formatModifier = "high-end masterpiece canvas wall art, gallery quality painting, majestic framing composition, center focused, ";
         } 
         else { 
             apiWidth = 1024; apiHeight = 1024; 
             currentTargetWidth = 1063; currentTargetHeight = 1063; 
+            formatModifier = "centered graphic design, perfectly balanced for flat square printing, ";
         }
 
         const btnSingle = document.getElementById('generateBtn');
@@ -236,30 +236,39 @@
                 statusEl.innerHTML = count > 1 ? `OTONOM ÜRETİM<br>Varyasyon: ${i} / ${count} (Seed: ${seed}) ⏳` : "Görsel İşleniyor... ⏳";
                 progressBar.style.width = `${((i - 1) / count) * 100}%`;
 
-                let finalPrompt = ""; 
-                let negativePrompt = "mug, cup, handle, coffee cup, physically on a table, 3d object of a mug, mockup, frame on a wall, watermark, human hands, split image, double images";
+                let basePrompt = ""; 
+                let negativePrompt = "text, watermark, typography, letters, signature, paper texture, folded paper, mockup, human hands, split image, double images, bad anatomy";
 
                 switch(selectedStyle) {
-                    case "shadowbox": finalPrompt = `A highly detailed ${englishSubject}, looking out from inside a deeply layered 3D cutout frame. The borders are intricately textured with jagged, snowy, frosty or paper-cut edges framing the subject perfectly. Deep 3D shadow box, diorama effect, faux 3D optical illusion, sharp drop shadows. Flat print design.`; break;
-                    case "popout": finalPrompt = `${englishSubject} bursting and popping out of the surface. Faux 3D optical illusion, trompe l'oeil effect, stark heavy drop shadows casting on the background, 3D relief pop-out effect, extreme depth of field, vivid colors. Flat printable texture.`; break;
-                    case "embossed": finalPrompt = `A flat, 2D printable surface texture showing a highly detailed ${englishSubject} sculpted as a 3D embossed ceramic relief. Faux 3D texture, strong directional studio lighting, realistic stone or matte ceramic shadows, tactile depth illusion.`; break;
-                    case "tunnel": finalPrompt = `A surreal, magical dream world fantasy tunnel. The edges are composed of thick, glowing, fluffy ethereal clouds creating a deep circular tunnel hole. Right in the center, looking out from INSIDE this deep magical hole, is a highly detailed ${englishSubject}. Faux 3D perfect optical illusion, whimsical, 8k.`; break;
-                    case "3dtext": finalPrompt = `3D embossed typography text spelling "${englishSubject}", popping out of a solid minimalist background. Tactile balloon or stone letters, faux 3D print illusion, heavy drop shadows, ultra crisp text rendering, flat print file.`; negativePrompt += ", misspelled words, bad lettering, illegible"; break;
-                    case "neontext": finalPrompt = `Glowing neon sign spelling "${englishSubject}" on a dark cyberpunk brick wall background. Vibrant fluorescent colors, faux 3D pop-out effect, high contrast, flat texture print, pristine typographic rendering.`; negativePrompt += ", misspelled words, bad lettering, illegible"; break;
-                    case "vintagetext": finalPrompt = `1950s retro vintage typography poster featuring the text "${englishSubject}". Distressed texture, nostalgic aesthetic font, bold retro color palette, classic diner or advertising style, flat printable design.`; negativePrompt += ", misspelled words, modern look, 3d render"; break;
-                    case "portal": finalPrompt = `A glowing interdimensional portal cracking open on a dark flat surface, revealing a breathtaking world of ${englishSubject} inside the rift. Faux 3D optical illusion, extreme depth, glowing edges, surrealism, flat printable canvas.`; break;
-                    case "escher": finalPrompt = `Mind-bending impossible geometry optical illusion featuring ${englishSubject}. M.C. Escher style, continuous paradox, interlocking shapes, black and white or muted tones, extreme detail, flat print design.`; break;
-                    case "isometric": finalPrompt = `Highly detailed isometric 3D miniature diorama of ${englishSubject}. Tilt-shift macro photography effect, tiny toy world aesthetic, faux 3D optical illusion floating on a solid background, flat print.`; break;
-                    case "kintsugi": finalPrompt = `Beautiful ${englishSubject} formed from cracked matte ceramic, joined with glowing liquid gold veins. Japanese Kintsugi repair art style, luxurious, 3D faux relief texture, elegant flat print.`; break;
-                    case "resin": finalPrompt = `Abstract luxury epoxy resin art and alcohol ink fluid painting forming the shape of ${englishSubject}. Swirling marble textures, gold foil flakes, vibrant liquid dye blending, high gloss illusion, flat texture print.`; break;
-                    case "ukiyoe": finalPrompt = `Traditional Japanese Ukiyo-e woodblock print of ${englishSubject}. The Great Wave off Kanagawa style, vintage muted colors, textured paper illusion, aesthetic traditional Asian art, flat illustration.`; break;
-                    case "steampunk": finalPrompt = `Intricate steampunk mechanical ${englishSubject}, made entirely of brass gears, copper cogs, and glowing steam pipes. Victorian industrial style, 3D faux relief mechanical art, flat print.`; break;
-                    case "popart": finalPrompt = `Vibrant retro comic book Pop Art of ${englishSubject}. Andy Warhol and Roy Lichtenstein style, bright bold colors, halftone dots, thick black comic outlines, flat printable poster graphic.`; break;
-                    case "neoncyber": finalPrompt = `Cyberpunk futuristic aesthetic, neon glowing ${englishSubject}. 3D holographic projection popping out, dark background with vibrant glowing pink, blue, and purple neon accents. Optical illusion of depth.`; break;
-                    case "stainedglass": finalPrompt = `A stunning intricate stained glass window depicting ${englishSubject}. Vibrant jewel-tone colors, thick dark lead lines, glowing bright light shining through from behind, faux 3D volumetric lighting.`; break;
-                    case "doubleexposure": finalPrompt = `Cinematic double exposure photography blending a perfect silhouette of ${englishSubject} with a breathtaking magical fantasy landscape inside the silhouette. High contrast, surrealism, flat print.`; break;
-                    case "graffiti": finalPrompt = `Vibrant, explosive urban graffiti wall art of ${englishSubject}. Spray paint drips, bold street art style, faux 3D pop-out graffiti, highly detailed colorful flat texture.`; break;
+                    // Dünya Klasikleri
+                    case "renaissance": basePrompt = `An absolute masterpiece oil painting of ${englishSubject}. High Renaissance art style, Leonardo da Vinci and Michelangelo aesthetic, chiaroscuro lighting, classic museum artwork, deep rich colors, historical fine art.`; break;
+                    case "impressionism": basePrompt = `A beautiful impressionist painting of ${englishSubject}. Vincent Van Gogh and Claude Monet style, thick visible brushstrokes, starry night aesthetic, vibrant emotional colors, dynamic movement in the paint.`; break;
+                    case "surrealism": basePrompt = `A surrealistic masterpiece depicting ${englishSubject}. Salvador Dali style, dreamlike atmosphere, melting elements, bizarre landscapes, highly detailed subconscious art, mind-bending fantasy.`; break;
+                    
+                    // Hype Akımlar
+                    case "unrealengine": basePrompt = `Extremely highly detailed ${englishSubject}, rendered in Unreal Engine 5. Hyper-realistic, 8k resolution, ray tracing reflections, cinematic global illumination, insanely detailed textures, volumetric fog, octane render masterpiece.`; break;
+                    case "synthwave": basePrompt = `Retrowave 1980s synthwave aesthetic of ${englishSubject}. Glowing neon grids, outrun style, vibrant magenta and cyan colors, digital sunset, cyber retro futurism.`; break;
+                    case "darkfantasy": basePrompt = `Epic dark fantasy RPG concept art of ${englishSubject}. Elden Ring and Dark Souls aesthetic, gothic, moody atmospheric lighting, highly detailed intricate armor or environments, masterpiece illustration.`; break;
+                    case "cyberpunk": basePrompt = `A futuristic cyberpunk vision of ${englishSubject}. High-tech neon city lighting, holographic details, dystopian sci-fi atmosphere, vibrant glowing pink and blue accents, ultra-detailed 8k.`; break;
+
+                    // İllüzyonlar & Derinlik
+                    case "popout": basePrompt = `${englishSubject} bursting and popping out of the surface. Faux 3D optical illusion, trompe l'oeil effect, stark heavy drop shadows casting on the background, 3D relief pop-out effect, extreme depth of field.`; break;
+                    case "embossed": basePrompt = `A surface texture showing a highly detailed ${englishSubject} sculpted as a 3D embossed ceramic relief. Faux 3D texture, strong directional studio lighting, realistic stone or matte ceramic shadows, tactile depth illusion.`; break;
+                    case "portal": basePrompt = `A glowing interdimensional portal cracking open, revealing a breathtaking world of ${englishSubject} inside the rift. Faux 3D optical illusion, extreme depth, glowing edges, surrealism.`; break;
+                    case "escher": basePrompt = `Mind-bending impossible geometry optical illusion featuring ${englishSubject}. M.C. Escher style, continuous paradox, interlocking shapes, highly detailed geometric perfection.`; break;
+                    case "isometric": basePrompt = `Highly detailed isometric 3D miniature diorama of ${englishSubject}. Tilt-shift macro photography effect, tiny toy world aesthetic, faux 3D optical illusion floating on a solid background.`; break;
+                    
+                    // Modern & Dokusal
+                    case "resin": basePrompt = `Abstract luxury epoxy resin art and alcohol ink fluid painting forming the shape of ${englishSubject}. Swirling marble textures, gold foil flakes, vibrant liquid dye blending, high gloss illusion.`; break;
+                    case "steampunk": basePrompt = `Intricate steampunk mechanical ${englishSubject}, made entirely of brass gears, copper cogs, and glowing steam pipes. Victorian industrial style, 3D faux relief mechanical art.`; break;
+                    case "popart": basePrompt = `Vibrant retro comic book Pop Art of ${englishSubject}. Andy Warhol and Roy Lichtenstein style, bright bold colors, halftone dots, thick black comic outlines, vintage graphic.`; break;
+                    case "stainedglass": basePrompt = `A stunning intricate stained glass window depicting ${englishSubject}. Vibrant jewel-tone colors, thick dark lead lines, glowing bright light shining through from behind, faux 3D volumetric lighting.`; break;
+                    case "doubleexposure": basePrompt = `Cinematic double exposure photography blending a perfect silhouette of ${englishSubject} with a breathtaking magical fantasy landscape inside the silhouette. High contrast, surrealism.`; break;
+                    case "graffiti": basePrompt = `Vibrant, explosive urban graffiti wall art of ${englishSubject}. Spray paint drips, bold street art style, faux 3D pop-out graffiti, highly detailed colorful texture.`; break;
                 }
+
+                // Formatı Prompta Zerk Et
+                let finalPrompt = formatModifier + basePrompt;
 
                 const startRes = await fetch("/api/generate", {
                     method: "POST", headers: { "Content-Type": "application/json" },
