@@ -186,21 +186,21 @@
         let apiWidth, apiHeight;
         let formatModifier = "";
         
-        // Akıllı Format Modifikasyonu
+        // Akıllı Format Modifikasyonu (Fiziksel obje kelimeleri temizlendi)
         if (printSize === "wrap") { 
             apiWidth = 1344; apiHeight = 576; 
             currentTargetWidth = 2480; currentTargetHeight = 1063; 
-            formatModifier = "seamless panoramic wrap-around print design, wide horizontal landscape, perfectly distributed composition, ";
+            formatModifier = "seamless panoramic wrap-around illustration, wide horizontal landscape, full edge-to-edge composition, ";
         } 
         else if (printSize === "table") { 
             apiWidth = 1152; apiHeight = 864; 
             currentTargetWidth = 4724; currentTargetHeight = 3543; 
-            formatModifier = "high-end masterpiece canvas wall art, gallery quality painting, majestic framing composition, center focused, ";
+            formatModifier = "high-end masterpiece illustration, gallery quality, full edge-to-edge composition, center focused, ";
         } 
         else { 
             apiWidth = 1024; apiHeight = 1024; 
             currentTargetWidth = 1063; currentTargetHeight = 1063; 
-            formatModifier = "centered graphic design, perfectly balanced for flat square printing, ";
+            formatModifier = "centered graphic design, full edge-to-edge illustration, perfectly balanced, ";
         }
 
         const btnSingle = document.getElementById('generateBtn');
@@ -237,13 +237,14 @@
                 progressBar.style.width = `${((i - 1) / count) * 100}%`;
 
                 let basePrompt = ""; 
-                let negativePrompt = "text, watermark, typography, letters, signature, paper texture, folded paper, mockup, human hands, split image, double images, bad anatomy";
+                // NEGATİF PROMPT GÜNCELLENDİ: Çerçeve, oda, müze duvarı gibi şeyler kesinlikle yasaklandı!
+                let negativePrompt = "frame, picture frame, hanging on wall, interior room, easel, gallery wall, exhibition, border, mockup, text, watermark, typography, letters, signature, paper texture, folded paper, human hands, split image, double images, bad anatomy";
 
                 switch(selectedStyle) {
                     // Dünya Klasikleri
-                    case "renaissance": basePrompt = `An absolute masterpiece oil painting of ${englishSubject}. High Renaissance art style, Leonardo da Vinci and Michelangelo aesthetic, chiaroscuro lighting, classic museum artwork, deep rich colors, historical fine art.`; break;
-                    case "impressionism": basePrompt = `A beautiful impressionist painting of ${englishSubject}. Vincent Van Gogh and Claude Monet style, thick visible brushstrokes, starry night aesthetic, vibrant emotional colors, dynamic movement in the paint.`; break;
-                    case "surrealism": basePrompt = `A surrealistic masterpiece depicting ${englishSubject}. Salvador Dali style, dreamlike atmosphere, melting elements, bizarre landscapes, highly detailed subconscious art, mind-bending fantasy.`; break;
+                    case "renaissance": basePrompt = `An absolute masterpiece oil painting of ${englishSubject}. High Renaissance classical art style, Leonardo da Vinci and Michelangelo aesthetic, chiaroscuro dramatic lighting, deep rich oil paint colors, historical fine art, edge-to-edge masterpiece.`; break;
+                    case "impressionism": basePrompt = `A beautiful impressionist painting of ${englishSubject}. Vincent Van Gogh and Claude Monet style, thick visible brushstrokes, starry night aesthetic, vibrant emotional colors, dynamic movement in the paint, edge-to-edge masterpiece.`; break;
+                    case "surrealism": basePrompt = `A surrealistic masterpiece depicting ${englishSubject}. Salvador Dali style, dreamlike atmosphere, melting elements, bizarre landscapes, highly detailed subconscious art, mind-bending fantasy, edge-to-edge masterpiece.`; break;
                     
                     // Hype Akımlar
                     case "unrealengine": basePrompt = `Extremely highly detailed ${englishSubject}, rendered in Unreal Engine 5. Hyper-realistic, 8k resolution, ray tracing reflections, cinematic global illumination, insanely detailed textures, volumetric fog, octane render masterpiece.`; break;
@@ -267,7 +268,6 @@
                     case "graffiti": basePrompt = `Vibrant, explosive urban graffiti wall art of ${englishSubject}. Spray paint drips, bold street art style, faux 3D pop-out graffiti, highly detailed colorful texture.`; break;
                 }
 
-                // Formatı Prompta Zerk Et
                 let finalPrompt = formatModifier + basePrompt;
 
                 const startRes = await fetch("/api/generate", {
